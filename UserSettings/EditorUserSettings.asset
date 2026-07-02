@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!162 &1
+EditorUserSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 4
+  m_ConfigSettings:
+    QuickInstaller_com.unity.purchasing_installRecorded:
+      value: 2550581500
+      flags: 0
+    QuickInstaller_com.unity.services.levelplay_installRecorded:
+      value: 2550581500
+      flags: 0
+    RecentlyUsedSceneGuid-0:
+      value: 5a08575f5207595a0f5d59741173094444164f7d7d2a23317c7a4465bbe1646d
+      flags: 0
+    RecentlyUsedSceneGuid-1:
+      value: 0601035e51535f5e5b5e0f7616275b4410161b722d2b71317c711f6ab1b8656d
+      flags: 0
+    RecentlyUsedSceneGuid-2:
+      value: 5b53020452070f0b5e5b547513720b4410164d2e792e24607d2a1c6ae1e1606d
+      flags: 0
+    RecentlyUsedSceneGuid-3:
+      value: 5508050006000b0c5b0b5d2643205c44454f1c7b742d20612b7c4a60b0b6613b
+      flags: 0
+    RecentlyUsedSceneGuid-4:
+      value: 5554520300000b095f5f097615220644474f19722e7c25632e7b1c61bbe5656a
+      flags: 0
+    RecentlyUsedSceneGuid-5:
+      value: 5305050557500b0b0e0c092716760c44444f4a297c7c206375281e36e1e4353a
+      flags: 0
+    RecentlyUsedSceneGuid-6:
+      value: 01020c0306515a08585b5a7349200944474f497e7b7a76667e7e4a64b4b83568
+      flags: 0
+    RecentlyUsedSceneGuid-7:
+      value: 5554515656500d0d5b0c5c7412715e44424e4f732a7f20327a7e1e65e0b4646d
+      flags: 0
+    RecentlyUsedSceneGuid-8:
+      value: 560506005c040f020c5d0a7042740d4417164e7e292d7e3674711861e7b56661
+      flags: 0
+    lightmappingBakingProfile:
+      value: 51
+      flags: 0
+    vcSharedLogLevel:
+      value: 0d5e400f0650
+      flags: 0
+  m_VCAutomaticAdd: 1
+  m_VCDebugCom: 0
+  m_VCDebugCmd: 0
+  m_VCDebugOut: 0
+  m_SemanticMergeMode: 2
+  m_DesiredImportWorkerCount: 1
+  m_StandbyImportWorkerCount: 1
+  m_IdleImportWorkerShutdownDelay: 60000
+  m_VCShowFailedCheckout: 1
+  m_VCOverwriteFailedCheckoutAssets: 1
+  m_VCProjectOverlayIcons: 1
+  m_VCHierarchyOverlayIcons: 1
+  m_VCOtherOverlayIcons: 1
+  m_VCAllowAsyncUpdate: 1
+  m_VCScanLocalPackagesOnConnect: 1
+  m_ArtifactGarbageCollection: 1
+  m_CompressAssetsOnImport: 1
