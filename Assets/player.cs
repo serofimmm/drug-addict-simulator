@@ -40,15 +40,17 @@ public class player : MonoBehaviour
         colideObject = GameObject.Find("colide object");
         rb = transform.parent.GetComponent<Rigidbody>();
         hand = GameObject.Find("hand");
-        inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
+        
         novell = GameObject.Find("novell").GetComponent<CanvasGroup>();
         Debug.Log(novell.name);
         nullObject = GameObject.Find("null");
-        for (int i = 1; i < 7; i++)
+        for (int i = 0; i < 8; i++)
         {
             inventory[i] = nullObject;
-            Debug.Log("slot "+i);
+            Debug.Log("slot " + i);
         }
+        inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
+
     }
 
     void Update()
@@ -145,10 +147,6 @@ public class player : MonoBehaviour
         {
             selectedSlot = 7;
         }
-        if (Keyboard.current.digit9Key.wasPressedThisFrame)
-        {
-            selectedSlot = 8;
-        }
         Camera.main.transform.rotation = Quaternion.Euler(Mathf.Lerp(60f, -60f, mousePos.y / Screen.height), mousePos.x, 0);
         if (hp <= 0)
         {
@@ -157,7 +155,6 @@ public class player : MonoBehaviour
             hp = 100;
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            Start();
         }
         if (oldhp > hp)
         {
