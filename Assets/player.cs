@@ -22,7 +22,7 @@ public class player : MonoBehaviour
     public float jumpForce = 30f;
     Rigidbody rb;
     public string work;
-    public GameObject[] inventory = new GameObject[8];
+    GameObject[] inventory = new GameObject[8];
     GameObject sugar;
     public int selectedSlot = 0;
     GameObject hand;
@@ -61,24 +61,33 @@ public class player : MonoBehaviour
             item = inventory[selectedSlot];
         }
 
-        if (GameObject.Find($"{inventory[selectedSlot].name}(Clone)") == null)
+        if (item != null && item != nullObject)
+        {
+            if (lastitem == null || lastitem.name != $"{item.name}(Clone)")
+            {
+                Destroy(lastitem);
+                float scaleX = item.transform.localScale.x;
+                float scaleY = item.transform.localScale.y;
+                float scaleZ = item.transform.localScale.z;
+                Debug.Log(scaleX + " " + scaleY + " " + scaleZ);
+                GameObject itemN = Instantiate(inventory[selectedSlot], hand.transform.Find("item"));
+                itemN.transform.localPosition = Vector3.zero;
+                itemN.transform.localRotation = Quaternion.identity;
+                itemN.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
+                lastitem = itemN;
+            }
+        }
+        else
         {
             Destroy(lastitem);
-            float scaleX = item.transform.localScale.x;
-            float scaleY = item.transform.localScale.y;
-            float scaleZ = item.transform.localScale.z;
-            Debug.Log(scaleX + " " + scaleY + " " + scaleZ);
-            GameObject itemN = Instantiate(inventory[selectedSlot], hand.transform.Find("item"));
-            itemN.transform.localPosition = Vector3.zero;
-            itemN.transform.localRotation = Quaternion.identity;
-            itemN.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
-            lastitem = itemN;
+            Destroy(item);
+            lastitem = null;
         }
-        if(work == "loader" && GameObject.Find("punktA(Clone)") == null)
+        if (work == "loader" && GameObject.Find("punktA(Clone)") == null)
         {
             Debug.Log("спавним поинты");
             Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-3, -1, 5), Quaternion.identity);
-            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(2, 0, 2), Quaternion.identity);
+            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(2, -1, 2), Quaternion.identity);
         }
         Vector2 mousePos = Mouse.current.position.ReadValue();
         script.fill = hp;
@@ -209,6 +218,14 @@ public class player : MonoBehaviour
         {
             inventory[2] = Resources.Load<GameObject>("Prefabs/box");
             selectedSlot = 2;
+        }
+        if (other.gameObject.name == "punktB(Clone)")
+        {
+            if(inventory[2] == Resources.Load<GameObject>("Prefabs/box"))
+            {
+                inventory[2] = nullObject;
+                money += 10;
+            }
         }
     }
 
