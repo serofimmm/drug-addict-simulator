@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "../../../../Загрузки/ajazz-control-center-develop"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.asset": "yaml",
+			"*.meta": "yaml",
+			"*.prefab": "yaml",
+			"*.unity": "yaml"
+		}
+	}
+}
