@@ -1,10 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\",
+  "WorkspaceRootPath": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\drug-addict-simulator\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\\u0441\u0435\u0440\u0430\u0444\u0438\u043C\\onedrive\\documents\\github\\drug-addict-simulator\\assets\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\\u0441\u0435\u0440\u0430\u0444\u0438\u043C\\onedrive\\documents\\github\\drug-addict-simulator\\drug-addict-simulator\\assets\\scripts\\playerscripts\\controler script.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playerscripts\\controler script.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|c:\\users\\\u0441\u0435\u0440\u0430\u0444\u0438\u043C\\onedrive\\documents\\github\\drug-addict-simulator\\drug-addict-simulator\\assets\\scripts\\playerscripts\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playerscripts\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -27,15 +31,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "player.cs",
-              "DocumentMoniker": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\Assets\\player.cs",
-              "RelativeDocumentMoniker": "Assets\\player.cs",
-              "ToolTip": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\Assets\\player.cs",
-              "RelativeToolTip": "Assets\\player.cs",
-              "ViewState": "AgIAAFEAAAAAAAAAAAAUwFgAAABYAAAAAAAAAA==",
+              "Title": "controler script.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\drug-addict-simulator\\Assets\\scripts\\playerScripts\\controler script.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\playerScripts\\controler script.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\drug-addict-simulator\\Assets\\scripts\\playerScripts\\controler script.cs",
+              "RelativeToolTip": "Assets\\scripts\\playerScripts\\controler script.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-02T12:31:31.97Z",
+              "WhenOpened": "2026-07-09T13:45:32.035Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "player.cs",
+              "DocumentMoniker": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\drug-addict-simulator\\Assets\\scripts\\playerScripts\\player.cs",
+              "RelativeDocumentMoniker": "Assets\\scripts\\playerScripts\\player.cs",
+              "ToolTip": "C:\\Users\\\u0421\u0435\u0440\u0430\u0444\u0438\u043C\\OneDrive\\Documents\\GitHub\\drug-addict-simulator\\drug-addict-simulator\\Assets\\scripts\\playerScripts\\player.cs",
+              "RelativeToolTip": "Assets\\scripts\\playerScripts\\player.cs",
+              "ViewState": "AgIAAJwAAAAAAAAAAAAYwKwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-09T12:37:23.513Z"
             }
           ]
         }

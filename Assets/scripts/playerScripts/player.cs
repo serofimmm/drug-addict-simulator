@@ -35,6 +35,11 @@ public class player : MonoBehaviour
     GameObject lastitem;
     CanvasGroup novell;
     GameObject nullObject;
+    public int hangry = 100;
+    int speedhangry = 5;
+    GameObject head;
+    GameObject hangryEl;
+    float startHangry;
 
     void Start()
     {
@@ -47,32 +52,31 @@ public class player : MonoBehaviour
         colideObject = GameObject.Find("colide object");
         rb = transform.parent.GetComponent<Rigidbody>();
         hand = GameObject.Find("hand");
-        
+        head = GameObject.Find("head");
         novell = GameObject.Find("novell").GetComponent<CanvasGroup>();
         Debug.Log(novell.name);
         nullObject = GameObject.Find("null");
+        hangryEl = GameObject.Find("hangryBar");
+        startHangry = hangryEl.transform.position.x;
         for (int i = 0; i < 8; i++)
         {
             inventory[i] = nullObject;
             Debug.Log("slot " + i);
         }
         inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
-
+        StartCoroutine(hangrytick());
     }
 
     void Update()
     {
-        
-        if (inventory[selectedSlot] != null)
-        {
-            item = inventory[selectedSlot];
-        }
+        item = inventory[selectedSlot];
 
         if (item != null && item != nullObject)
         {
             if (lastitem == null || lastitem.name != $"{item.name}(Clone)")
             {
                 Destroy(lastitem);
+                Debug.Log(inventory);
                 float scaleX = item.transform.localScale.x;
                 float scaleY = item.transform.localScale.y;
                 float scaleZ = item.transform.localScale.z;
@@ -89,6 +93,7 @@ public class player : MonoBehaviour
             Destroy(lastitem);
             Destroy(item);
             lastitem = null;
+            inventory[selectedSlot] = nullObject;
         }
         if (work == "loader" && GameObject.Find("punktA(Clone)") == null)
         {
@@ -99,6 +104,7 @@ public class player : MonoBehaviour
         Vector2 mousePos = Mouse.current.position.ReadValue();
         script.fill = hp;
         balance.text = money + "$";
+        hangryEl.transform.position = new Vector2(Mathf.Lerp(startHangry, startHangry - 100, hangry / 100f), hangryEl.transform.position.y);
         if (Keyboard.current.wKey.isPressed)
         {
             transform.parent.position += Camera.main.transform.forward * Time.deltaTime * speed;
@@ -117,15 +123,19 @@ public class player : MonoBehaviour
         }
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded == true)
         {
+            speedhangry = 2;
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            speedhangry = 5;
         }
         if (Keyboard.current.leftShiftKey.isPressed)
-        {
+        { 
             speed = 15f;
+            speedhangry = 2;
         }
         if (Keyboard.current.leftShiftKey.wasReleasedThisFrame)
         {
             speed = 5f;
+            speedhangry = 5;
         }
         if (transform.parent.position.y <= -40f)
         {
@@ -171,7 +181,7 @@ public class player : MonoBehaviour
 
         xRotation = Mathf.Clamp(xRotation, -80f, 80f);
 
-        Camera.main.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        head.transform.localRotation = Quaternion.Euler(0f, 0f, -xRotation);
         transform.parent.rotation = Quaternion.Euler(0f, yRotation, 0f);
 
         if (hp <= 0)
@@ -197,6 +207,15 @@ public class player : MonoBehaviour
         damage.SetActive(true);
         yield return new WaitForSeconds(0.1f);
         damage.SetActive(false);
+    }
+
+    IEnumerator hangrytick()
+    {
+        while(hangry > 0)
+        {
+            yield return new WaitForSeconds(speedhangry);
+            hangry--;
+        }
     }
 
     void OnTriggerEnter(Collider other)
