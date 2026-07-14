@@ -38,8 +38,9 @@ public class player : MonoBehaviour
     public int hangry = 100;
     int speedhangry = 5;
     GameObject head;
-    GameObject hangryEl;
+    RectTransform hangryEl;
     float startHangry;
+    int smokedcigarettes = 1;
 
     void Start()
     {
@@ -56,14 +57,16 @@ public class player : MonoBehaviour
         novell = GameObject.Find("novell").GetComponent<CanvasGroup>();
         Debug.Log(novell.name);
         nullObject = GameObject.Find("null");
-        hangryEl = GameObject.Find("hangryBar");
-        startHangry = hangryEl.transform.position.x;
+        hangryEl = GameObject.Find("hangryBar").GetComponent<RectTransform>();
+        startHangry = hangryEl.anchoredPosition.x;
+        Debug.Log(startHangry);
         for (int i = 0; i < 8; i++)
         {
             inventory[i] = nullObject;
             Debug.Log("slot " + i);
         }
         inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
+        inventory[1] = Resources.Load<GameObject>("Prefabs/cigarettes");
         StartCoroutine(hangrytick());
     }
 
@@ -101,26 +104,28 @@ public class player : MonoBehaviour
             Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-3, -1, 5), Quaternion.identity);
             Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(2, -1, 2), Quaternion.identity);
         }
+        if (inventory[selectedSlot] == Resources.Load<GameObject>("Prefabs/cigarettes"))
+        {
+            Debug.Log("держыш в руках");
+            for(int i = 1; i <= smokedcigarettes; i++)
+            {
+                Debug.Log(inventory[selectedSlot].transform.Find("cigarette" + i).gameObject.name);
+                Destroy(GameObject.Find("cigarette" + i));
+            }
+            
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                Destroy(inventory[selectedSlot].transform.Find("cigarette" + smokedcigarettes));
+                smokedcigarettes++;
+            }
+        }
         Vector2 mousePos = Mouse.current.position.ReadValue();
         script.fill = hp;
         balance.text = money + "$";
-        hangryEl.transform.position = new Vector2(Mathf.Lerp(startHangry, startHangry - 100, hangry / 100f), hangryEl.transform.position.y);
-        if (Keyboard.current.wKey.isPressed)
-        {
-            transform.parent.position += Camera.main.transform.forward * Time.deltaTime * speed;
-        }
-        if (Keyboard.current.sKey.isPressed)
-        {
-            transform.parent.position -= Camera.main.transform.forward * Time.deltaTime * speed;
-        }
-        if (Keyboard.current.aKey.isPressed)
-        {
-            transform.parent.position -= Camera.main.transform.right * Time.deltaTime * speed;
-        }
-        if (Keyboard.current.dKey.isPressed)
-        {
-            transform.parent.position += Camera.main.transform.right * Time.deltaTime * speed;
-        }
+        float value = startHangry - (605 - hangry);
+        hangryEl.anchoredPosition = new Vector2(value, hangryEl.anchoredPosition.y);
+        Debug.Log(Mathf.Lerp(startHangry - 100, startHangry, hangry / 100f));
+        
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded == true)
         {
             speedhangry = 2;
@@ -200,7 +205,36 @@ public class player : MonoBehaviour
     }
     void FixedUpdate()
     {
+        Vector3 move = Vector3.zero;
 
+        Vector3 forward = Camera.main.transform.forward;
+        Vector3 right = Camera.main.transform.right;
+
+        forward.y = 0;
+        right.y = 0;
+
+        forward.Normalize();
+        right.Normalize();
+
+
+        if (Keyboard.current.wKey.isPressed)
+        {
+            move += forward;
+        }
+        if (Keyboard.current.sKey.isPressed)
+        {
+            move -= forward;
+        }
+        if (Keyboard.current.aKey.isPressed)
+        {
+            move -= right;
+        }
+        if (Keyboard.current.dKey.isPressed)
+        {
+            move += right;
+        }
+
+        transform.parent.position += move.normalized * speed * Time.fixedDeltaTime;
     }
     IEnumerator ShowDamageScreen()
     {

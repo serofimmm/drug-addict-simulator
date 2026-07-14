@@ -12,7 +12,7 @@ public class hpbar : MonoBehaviour
     void Update()
     {
 
-        transform.parent.localScale = new Vector3(fill/100*2, 1f, 1f);
+        transform.parent.localScale = new Vector3(fill / 100 * 2, 1f, 1f);
         transform.parent.position = new Vector3((fill/100*2 - 1f) * 0.5f, transform.parent.position.y, transform.parent.position.z);
     }
 }
