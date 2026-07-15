@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.VisualScripting;
@@ -40,12 +41,12 @@ public class player : MonoBehaviour
     GameObject head;
     RectTransform hangryEl;
     float startHangry;
-    int smokedcigarettes = 1;
+    Dictionary<string, int> smokedcigarettes = new Dictionary<string, int>();
+    int ids = 0;
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        
         script = GameObject.Find("hpbar").GetComponent<hpbar>();
         balance = GameObject.Find("money").GetComponent<TextMeshProUGUI>();
         damage = GameObject.Find("damage");
@@ -67,6 +68,9 @@ public class player : MonoBehaviour
         }
         inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
         inventory[1] = Resources.Load<GameObject>("Prefabs/cigarettes");
+        int id = randomID();
+        inventory[1].name = "cigarettes-"+id;
+        smokedcigarettes["cigarettes-" + id] = 1;
         StartCoroutine(hangrytick());
     }
 
@@ -104,22 +108,25 @@ public class player : MonoBehaviour
             Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-3, -1, 5), Quaternion.identity);
             Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(2, -1, 2), Quaternion.identity);
         }
-        if (inventory[selectedSlot] == Resources.Load<GameObject>("Prefabs/cigarettes"))
+        if(inventory[selectedSlot] != nullObject)
         {
-            Debug.Log("держыш в руках");
-            for(int i = 1; i <= smokedcigarettes; i++)
+            if (inventory[selectedSlot].tag == "cigarettes")
             {
-                Debug.Log(inventory[selectedSlot].transform.Find("cigarette" + i).gameObject.name);
-                Destroy(GameObject.Find("cigarette" + i));
-            }
-            
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                Destroy(inventory[selectedSlot].transform.Find("cigarette" + smokedcigarettes));
-                smokedcigarettes++;
+                Debug.Log("держыш в руках");
+                for (int i = 1; i <= smokedcigarettes[inventory[selectedSlot].name]; i++)
+                {
+                    
+                    Destroy(GameObject.Find("cigarette" + i));
+                }
+
+                if (Mouse.current.leftButton.wasPressedThisFrame)
+                {
+                    Destroy(inventory[selectedSlot].transform.Find("cigarette" + smokedcigarettes));
+                    smokedcigarettes[inventory[selectedSlot].name]++;
+                }
             }
         }
-        Vector2 mousePos = Mouse.current.position.ReadValue();
+            Vector2 mousePos = Mouse.current.position.ReadValue();
         script.fill = hp;
         balance.text = money + "$";
         float value = startHangry - (605 - hangry);
@@ -275,9 +282,52 @@ public class player : MonoBehaviour
             money -= 100;
         }
 
-        if (other.CompareTag("robert"))
+        if (other.CompareTag("shop"))
         {
-            novell.alpha = 1;
+            if (other.gameObject.name == "robert")
+            {
+                novell.alpha = 1;
+                novell.transform.Find("text").GetComponent<TextMeshProUGUI>().text = "Robert: привет я Роберт продавец запрещеных вещей, хотите ли вы чтото купить?";
+                novell.transform.Find("Button1").GetComponentInChildren<TextMeshProUGUI>().text = "Да";
+                novell.transform.Find("Button2").GetComponentInChildren<TextMeshProUGUI>().text = "Нет";
+                novell.transform.Find("Button2").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+                {
+                    novell.alpha = 0;
+                });
+                novell.transform.Find("Button1").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+                {
+                    novell.transform.Find("text").GetComponent<TextMeshProUGUI>().text = "Robert: отлично, у меня есть сахар и сигареты, что вы хотите купить?";
+                    novell.transform.Find("Button1").GetComponentInChildren<TextMeshProUGUI>().text = "Сахар 20$/грам";
+                    novell.transform.Find("Button2").GetComponentInChildren<TextMeshProUGUI>().text = "Сигареты 5$";
+                    novell.transform.Find("Button1").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+                    {
+                        if (money >= 20)
+                        {
+                            money -= 20;
+                            inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
+                        }
+                    });
+                    novell.transform.Find("Button2").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
+                    {
+                        if (money >= 5)
+                        {
+                            money -= 5;
+                            for(int i = 0; i < 8; i++)
+                            {
+                                if (inventory[i] == nullObject)
+                                {
+                                    int id = randomID();
+                                    inventory[i] = Resources.Load<GameObject>("Prefabs/cigarettes");
+                                    inventory[i].name = "cigarettes-" + id;
+                                    smokedcigarettes["cigarettes-" + id] = 1;
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                });
+                Cursor.visible = true;
+            }  
         }
 
         if (other.CompareTag("work"))
@@ -288,16 +338,27 @@ public class player : MonoBehaviour
 
         if (other.gameObject.name == "punktA(Clone)")
         {
-            inventory[2] = Resources.Load<GameObject>("Prefabs/box");
-            selectedSlot = 2;
+            for (int i = 0; i < 8; i++)
+            {
+                if (inventory[i] == nullObject)
+                {
+                    inventory[i] = Resources.Load<GameObject>("Prefabs/box");
+                    selectedSlot = i;
+                    break;
+                }
+            }
         }
 
         if (other.gameObject.name == "punktB(Clone)")
         {
-            if (inventory[2] == Resources.Load<GameObject>("Prefabs/box"))
+            for (int i = 0; i < 8; i++)
             {
-                inventory[2] = nullObject;
-                money += 10;
+                if (inventory[i] == Resources.Load<GameObject>("Prefabs/box"))
+                {
+                    inventory[i] = nullObject;
+                    money += 10;
+                    break;
+                }
             }
         }
     }
@@ -314,10 +375,15 @@ public class player : MonoBehaviour
             }
         }
 
-        if (other.CompareTag("robert"))
+        if (other.CompareTag("shop"))
         {
             novell.alpha = 0;
+            Cursor.visible = false;
         }
+    }
+    int randomID()
+    {
+        return ids++;
     }
 
 }
