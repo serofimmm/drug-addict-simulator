@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,12 +29,13 @@ public class player : MonoBehaviour
     public float jumpForce = 30f;
     Rigidbody rb;
     public string work;
-    GameObject[] inventory = new GameObject[8];
+    InventoryItem[] inventory = new InventoryItem[8];
     GameObject sugar;
     public int selectedSlot = 0;
     GameObject hand;
-    GameObject item;
+    InventoryItem item;
     GameObject lastitem;
+    InventoryItem lastInvItem;
     CanvasGroup novell;
     GameObject nullObject;
     public int hangry = 100;
@@ -41,7 +43,7 @@ public class player : MonoBehaviour
     GameObject head;
     RectTransform hangryEl;
     float startHangry;
-    Dictionary<string, int> smokedcigarettes = new Dictionary<string, int>();
+    Dictionary<InventoryItem, int> smokedcigarettes = new Dictionary<InventoryItem, int>();
     int ids = 0;
 
     void Start()
@@ -63,14 +65,20 @@ public class player : MonoBehaviour
         Debug.Log(startHangry);
         for (int i = 0; i < 8; i++)
         {
-            inventory[i] = nullObject;
-            Debug.Log("slot " + i);
+            inventory[i] = new InventoryItem();
+            inventory[i].prefab = nullObject;
         }
-        inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
-        inventory[1] = Resources.Load<GameObject>("Prefabs/cigarettes");
+        InventoryItem sugar = new InventoryItem();
+        sugar.prefab = Resources.Load<GameObject>("Prefabs/sugar");
+        sugar.id = Guid.NewGuid().ToString();
+        inventory[0] = sugar;
+        InventoryItem cigarette = new InventoryItem();
+        cigarette.prefab = Resources.Load<GameObject>("Prefabs/cigarettes");
+        cigarette.id = Guid.NewGuid().ToString();
+        inventory[1] = cigarette;
         int id = randomID();
-        inventory[1].name = "cigarettes-"+id;
-        smokedcigarettes["cigarettes-" + id] = 1;
+        
+        smokedcigarettes[cigarette] = 1;
         StartCoroutine(hangrytick());
     }
 
@@ -78,17 +86,17 @@ public class player : MonoBehaviour
     {
         item = inventory[selectedSlot];
 
-        if (item != null && item != nullObject)
+        if (item != null && item.prefab != nullObject)
         {
-            if (lastitem == null || lastitem.name != $"{item.name}(Clone)")
+            if (lastitem == null || lastitem.name != $"{item.prefab.name}(Clone)")
             {
                 Destroy(lastitem);
                 Debug.Log(inventory);
-                float scaleX = item.transform.localScale.x;
-                float scaleY = item.transform.localScale.y;
-                float scaleZ = item.transform.localScale.z;
+                float scaleX = item.prefab.transform.localScale.x;
+                float scaleY = item.prefab.transform.localScale.y;
+                float scaleZ = item.prefab.transform.localScale.z;
                 Debug.Log(scaleX + " " + scaleY + " " + scaleZ);
-                GameObject itemN = Instantiate(inventory[selectedSlot], hand.transform.Find("item"));
+                GameObject itemN = Instantiate(inventory[selectedSlot].prefab, hand.transform.Find("item"));
                 itemN.transform.localPosition = Vector3.zero;
                 itemN.transform.localRotation = Quaternion.identity;
                 itemN.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
@@ -98,9 +106,9 @@ public class player : MonoBehaviour
         else
         {
             Destroy(lastitem);
-            Destroy(item);
+            Destroy(item.prefab);
             lastitem = null;
-            inventory[selectedSlot] = nullObject;
+            inventory[selectedSlot].prefab = nullObject;
         }
         if (work == "loader" && GameObject.Find("punktA(Clone)") == null)
         {
@@ -108,21 +116,20 @@ public class player : MonoBehaviour
             Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-3, -1, 5), Quaternion.identity);
             Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(2, -1, 2), Quaternion.identity);
         }
-        if(inventory[selectedSlot] != nullObject)
+        if(inventory[selectedSlot].prefab != nullObject)
         {
-            if (inventory[selectedSlot].tag == "cigarettes")
+            if (inventory[selectedSlot].prefab.tag == "cigarettes")
             {
                 Debug.Log("держыш в руках");
-                for (int i = 1; i <= smokedcigarettes[inventory[selectedSlot].name]; i++)
+                for (int i = 0; i <= smokedcigarettes[inventory[selectedSlot]]; i++)
                 {
-                    
                     Destroy(GameObject.Find("cigarette" + i));
                 }
 
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    Destroy(inventory[selectedSlot].transform.Find("cigarette" + smokedcigarettes));
-                    smokedcigarettes[inventory[selectedSlot].name]++;
+                    Destroy(GameObject.Find("cigarette" + smokedcigarettes[inventory[selectedSlot]]));
+                    smokedcigarettes[inventory[selectedSlot]]++;
                 }
             }
         }
@@ -131,7 +138,6 @@ public class player : MonoBehaviour
         balance.text = money + "$";
         float value = startHangry - (605 - hangry);
         hangryEl.anchoredPosition = new Vector2(value, hangryEl.anchoredPosition.y);
-        Debug.Log(Mathf.Lerp(startHangry - 100, startHangry, hangry / 100f));
         
         if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded == true)
         {
@@ -304,7 +310,10 @@ public class player : MonoBehaviour
                         if (money >= 20)
                         {
                             money -= 20;
-                            inventory[0] = Resources.Load<GameObject>("Prefabs/sugar");
+                            InventoryItem sugar = new InventoryItem();
+                            sugar.prefab = Resources.Load<GameObject>("Prefabs/sugar");
+                            sugar.id = Guid.NewGuid().ToString();
+                            inventory[0] = sugar;
                         }
                     });
                     novell.transform.Find("Button2").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
@@ -314,12 +323,14 @@ public class player : MonoBehaviour
                             money -= 5;
                             for(int i = 0; i < 8; i++)
                             {
-                                if (inventory[i] == nullObject)
+                                if (inventory[i].prefab == nullObject)
                                 {
                                     int id = randomID();
-                                    inventory[i] = Resources.Load<GameObject>("Prefabs/cigarettes");
-                                    inventory[i].name = "cigarettes-" + id;
-                                    smokedcigarettes["cigarettes-" + id] = 1;
+                                    InventoryItem cigarette = new InventoryItem();
+                                    cigarette.prefab = Resources.Load<GameObject>("Prefabs/cigarettes");
+                                    cigarette.id = Guid.NewGuid().ToString();
+                                    inventory[i] = cigarette;
+                                    smokedcigarettes[cigarette] = 1;
                                     break;
                                 }
                             }
@@ -340,9 +351,12 @@ public class player : MonoBehaviour
         {
             for (int i = 0; i < 8; i++)
             {
-                if (inventory[i] == nullObject)
+                if (inventory[i].prefab == nullObject)
                 {
-                    inventory[i] = Resources.Load<GameObject>("Prefabs/box");
+                    InventoryItem box = new InventoryItem();
+                    box.prefab = Resources.Load<GameObject>("Prefabs/cigarettes");
+                    box.id = Guid.NewGuid().ToString();
+                    inventory[i] = box;
                     selectedSlot = i;
                     break;
                 }
@@ -353,9 +367,9 @@ public class player : MonoBehaviour
         {
             for (int i = 0; i < 8; i++)
             {
-                if (inventory[i] == Resources.Load<GameObject>("Prefabs/box"))
+                if (inventory[i].prefab == Resources.Load<GameObject>("Prefabs/box"))
                 {
-                    inventory[i] = nullObject;
+                    inventory[i].prefab = nullObject;
                     money += 10;
                     break;
                 }
@@ -386,4 +400,9 @@ public class player : MonoBehaviour
         return ids++;
     }
 
+}
+public class InventoryItem
+{
+    public GameObject prefab;
+    public string id;
 }
