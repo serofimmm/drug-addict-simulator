@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class player : MonoBehaviour
 {
@@ -71,10 +72,12 @@ public class player : MonoBehaviour
         InventoryItem sugar = new InventoryItem();
         sugar.prefab = Resources.Load<GameObject>("Prefabs/sugar");
         sugar.id = Guid.NewGuid().ToString();
+        sugar.image = Resources.Load<Sprite>("sprites/sugar");
         inventory[0] = sugar;
         InventoryItem cigarette = new InventoryItem();
         cigarette.prefab = Resources.Load<GameObject>("Prefabs/cigarettes");
         cigarette.id = Guid.NewGuid().ToString();
+        cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
         inventory[1] = cigarette;
         int id = randomID();
         
@@ -84,11 +87,15 @@ public class player : MonoBehaviour
 
     void Update()
     {
+        for(int i = 0; i < 8; i++)
+        {
+            GameObject.Find("inventory").transform.Find("inv block"+i).GetComponent<Image>().sprite = inventory[i].image;
+        }
         item = inventory[selectedSlot];
 
         if (item != null && item.prefab != nullObject)
         {
-            if (lastitem == null || lastitem.name != $"{item.prefab.name}(Clone)")
+            if (lastitem == null || lastInvItem != item)
             {
                 Destroy(lastitem);
                 Debug.Log(inventory);
@@ -101,12 +108,12 @@ public class player : MonoBehaviour
                 itemN.transform.localRotation = Quaternion.identity;
                 itemN.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
                 lastitem = itemN;
+                lastInvItem = item;
             }
         }
         else
         {
             Destroy(lastitem);
-            Destroy(item.prefab);
             lastitem = null;
             inventory[selectedSlot].prefab = nullObject;
         }
@@ -313,6 +320,7 @@ public class player : MonoBehaviour
                             InventoryItem sugar = new InventoryItem();
                             sugar.prefab = Resources.Load<GameObject>("Prefabs/sugar");
                             sugar.id = Guid.NewGuid().ToString();
+                            sugar.image = Resources.Load<Sprite>("sprites/sugar");
                             inventory[0] = sugar;
                         }
                     });
@@ -329,6 +337,7 @@ public class player : MonoBehaviour
                                     InventoryItem cigarette = new InventoryItem();
                                     cigarette.prefab = Resources.Load<GameObject>("Prefabs/cigarettes");
                                     cigarette.id = Guid.NewGuid().ToString();
+                                    cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
                                     inventory[i] = cigarette;
                                     smokedcigarettes[cigarette] = 1;
                                     break;
@@ -354,7 +363,7 @@ public class player : MonoBehaviour
                 if (inventory[i].prefab == nullObject)
                 {
                     InventoryItem box = new InventoryItem();
-                    box.prefab = Resources.Load<GameObject>("Prefabs/cigarettes");
+                    box.prefab = Resources.Load<GameObject>("Prefabs/box");
                     box.id = Guid.NewGuid().ToString();
                     inventory[i] = box;
                     selectedSlot = i;
@@ -405,4 +414,5 @@ public class InventoryItem
 {
     public GameObject prefab;
     public string id;
+    public Sprite image;
 }
