@@ -89,7 +89,14 @@ public class player : MonoBehaviour
     {
         for(int i = 0; i < 8; i++)
         {
-            GameObject.Find("inventory").transform.Find("inv block"+i).GetComponent<Image>().sprite = inventory[i].image;
+            if(inventory[i].prefab != nullObject)
+            {
+                GameObject.Find("inventory").transform.Find("inv block" + i).GetComponent<Image>().sprite = inventory[i].image;
+            }
+            else
+            {
+                GameObject.Find("inventory").transform.Find("inv block" + i).GetComponent<Image>().sprite = null;
+            }
         }
         item = inventory[selectedSlot];
 
@@ -365,6 +372,7 @@ public class player : MonoBehaviour
                     InventoryItem box = new InventoryItem();
                     box.prefab = Resources.Load<GameObject>("Prefabs/box");
                     box.id = Guid.NewGuid().ToString();
+                    box.image = Resources.Load<Sprite>("sprites/box");
                     inventory[i] = box;
                     selectedSlot = i;
                     break;
