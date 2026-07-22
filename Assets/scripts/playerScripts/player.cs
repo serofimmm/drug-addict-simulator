@@ -44,8 +44,11 @@ public class player : MonoBehaviour
     GameObject head;
     RectTransform hangryEl;
     float startHangry;
+    GameObject mapObject;
     Dictionary<InventoryItem, int> smokedcigarettes = new Dictionary<InventoryItem, int>();
     int ids = 0;
+    float mapSizeX = 151.856f;
+    float mapSizeZ = 95.52282f;
 
     void Start()
     {
@@ -126,9 +129,24 @@ public class player : MonoBehaviour
         }
         if (work == "loader" && GameObject.Find("punktA(Clone)") == null)
         {
-            Debug.Log("������� ������");
-            Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-3, -1, 5), Quaternion.identity);
-            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(2, -1, 2), Quaternion.identity);
+            Collider col = mapObject.GetComponent<Collider>();
+
+            Vector3 min = col.bounds.min;
+            Vector3 max = col.bounds.max;
+            float randomX1 = UnityEngine.Random.Range(min.x, max.x);
+            float randomZ1 = UnityEngine.Random.Range(min.z, max.z);
+
+            float randomX2 = UnityEngine.Random.Range(min.x, max.x);
+            float randomZ2 = UnityEngine.Random.Range(min.z, max.z);
+            while (Vector3.Distance(new Vector3(randomX2, -1.5f, randomZ2), new Vector3(randomX1, -1.5f, randomZ1)) >= 20)
+            {
+                randomX2 = UnityEngine.Random.Range(min.x, max.x);
+                randomZ2 = UnityEngine.Random.Range(min.z, max.z);
+            }
+            
+            Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(randomX1, -1.5f, randomZ1), Quaternion.identity);
+            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(randomX2, -1.5f, randomZ2), Quaternion.identity);
+            Debug.Log("заспавнены на ("+randomX1+","+randomZ1+")(" + randomX2 + "," + randomZ2 + ")");
         }
         if(inventory[selectedSlot].prefab != nullObject)
         {
@@ -223,6 +241,11 @@ public class player : MonoBehaviour
             hp = 100;
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
+            for (int i = 0; i < 8; i++)
+            {
+                inventory[i] = new InventoryItem();
+                inventory[i].prefab = nullObject;
+            }
         }
         if (oldhp > hp)
         {
@@ -304,6 +327,10 @@ public class player : MonoBehaviour
 
         if (other.CompareTag("shop"))
         {
+            if(mapObject == null)
+            {
+                mapObject = other.gameObject;
+            }
             if (other.gameObject.name == "robert")
             {
                 novell.alpha = 1;
