@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
+using TMPro.Examples;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -45,6 +46,7 @@ public class player : MonoBehaviour
     RectTransform hangryEl;
     float startHangry;
     GameObject mapObject;
+    bool lockedPlayer = false;
     Dictionary<InventoryItem, int> smokedcigarettes = new Dictionary<InventoryItem, int>();
     int ids = 0;
     float mapSizeX = 151.856f;
@@ -52,7 +54,7 @@ public class player : MonoBehaviour
 
     void Start()
     {
-        
+        Cursor.visible = false;
         script = GameObject.Find("hpbar").GetComponent<hpbar>();
         balance = GameObject.Find("money").GetComponent<TextMeshProUGUI>();
         damage = GameObject.Find("damage");
@@ -171,12 +173,7 @@ public class player : MonoBehaviour
         float value = startHangry - (605 - hangry);
         hangryEl.anchoredPosition = new Vector2(value, hangryEl.anchoredPosition.y);
         
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded == true)
-        {
-            speedhangry = 2;
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            speedhangry = 5;
-        }
+        
         if (Keyboard.current.leftShiftKey.isPressed)
         { 
             speed = 15f;
@@ -223,17 +220,19 @@ public class player : MonoBehaviour
         {
             selectedSlot = 7;
         }
-        
-        Vector2 mouseDelta = Mouse.current.delta.ReadValue() * mouseSensitivity;
 
-        yRotation += mouseDelta.x;
-        xRotation -= mouseDelta.y;
+        if (!lockedPlayer)
+        {
+            Vector2 mouseDelta = Mouse.current.delta.ReadValue() * mouseSensitivity;
 
-        xRotation = Mathf.Clamp(xRotation, -80f, 80f);
+            yRotation += mouseDelta.x;
+            xRotation -= mouseDelta.y;
 
-        head.transform.localRotation = Quaternion.Euler(0f, 0f, -xRotation);
-        transform.parent.rotation = Quaternion.Euler(0f, yRotation, 0f);
+            xRotation = Mathf.Clamp(xRotation, -80f, 80f);
 
+            head.transform.localRotation = Quaternion.Euler(0f, 0f, -xRotation);
+            transform.parent.rotation = Quaternion.Euler(0f, yRotation, 0f);
+        }
         if (hp <= 0)
         {
             transform.parent.position = new Vector3(0, 0, 0);
@@ -255,6 +254,7 @@ public class player : MonoBehaviour
     }
     void FixedUpdate()
     {
+        
         Vector3 move = Vector3.zero;
 
         Vector3 forward = Camera.main.transform.forward;
@@ -283,6 +283,12 @@ public class player : MonoBehaviour
         {
             move += right;
         }
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded == true)
+        {
+            speedhangry = 2;
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            speedhangry = 5;
+        }
 
         transform.parent.position += move.normalized * speed * Time.fixedDeltaTime;
     }
@@ -304,6 +310,10 @@ public class player : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (mapObject == null)
+        {
+            mapObject = other.gameObject;
+        }
         if (other.CompareTag("ground"))
         {
             groundContacts++;
@@ -327,10 +337,7 @@ public class player : MonoBehaviour
 
         if (other.CompareTag("shop"))
         {
-            if(mapObject == null)
-            {
-                mapObject = other.gameObject;
-            }
+            lockedPlayer = true;
             if (other.gameObject.name == "robert")
             {
                 novell.alpha = 1;
@@ -437,6 +444,7 @@ public class player : MonoBehaviour
         {
             novell.alpha = 0;
             Cursor.visible = false;
+            lockedPlayer = false;
         }
     }
     int randomID()
