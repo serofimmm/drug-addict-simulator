@@ -28,7 +28,7 @@ public class player : MonoBehaviour
     GameObject damage;
     GameObject colideObject;
     bool isGrounded;
-    public float jumpForce = 30f;
+    public float jumpForce = 0.7f;
     Rigidbody rb;
     public string work;
     InventoryItem[] inventory = new InventoryItem[8];
@@ -172,7 +172,7 @@ public class player : MonoBehaviour
         balance.text = money + "$";
         float value = startHangry - (605 - hangry);
         hangryEl.anchoredPosition = new Vector2(value, hangryEl.anchoredPosition.y);
-        
+
         
         if (Keyboard.current.leftShiftKey.isPressed)
         { 
@@ -283,7 +283,7 @@ public class player : MonoBehaviour
         {
             move += right;
         }
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded == true)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             speedhangry = 2;
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);

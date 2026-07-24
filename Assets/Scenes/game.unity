@@ -2341,7 +2341,7 @@ GameObject:
   - component: {fileID: 500915193}
   m_Layer: 0
   m_Name: Cube (5)
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3414,7 +3414,7 @@ GameObject:
   - component: {fileID: 697254793}
   m_Layer: 0
   m_Name: Cube (9)
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3921,7 +3921,7 @@ GameObject:
   - component: {fileID: 811720454}
   m_Layer: 0
   m_Name: Cube (7)
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4387,8 +4387,8 @@ Transform:
   m_GameObject: {fileID: 940760273}
   serializedVersion: 2
   m_LocalRotation: {x: 0.4926749, y: 0.41444483, z: -0.537202, w: 0.5449046}
-  m_LocalPosition: {x: -0.21, y: 1.13, z: -2.81}
-  m_LocalScale: {x: 3.5968978, y: 2.906988, z: 2.2798996}
+  m_LocalPosition: {x: 0.06, y: 1.49, z: -2.85}
+  m_LocalScale: {x: 1.0493486, y: 0.84807634, z: 0.66513145}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8999794594668267600}
@@ -5803,7 +5803,7 @@ GameObject:
   - component: {fileID: 1310442161}
   m_Layer: 0
   m_Name: Cube (6)
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6166,7 +6166,7 @@ GameObject:
   - component: {fileID: 1429732491}
   m_Layer: 0
   m_Name: Cube (4)
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8726,7 +8726,7 @@ GameObject:
   - component: {fileID: 2120665162}
   m_Layer: 0
   m_Name: Cube (8)
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12521,7 +12521,7 @@ Transform:
   m_GameObject: {fileID: 8868452380862088034}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7383535, y: -0.6740619, z: -0.021244079, w: -0.004844904}
-  m_LocalPosition: {x: -0.03, y: -0.246, z: 0.25}
+  m_LocalPosition: {x: -0.025, y: -0.244, z: 0.121}
   m_LocalScale: {x: 0.3118942, y: 0.34241933, z: 0.3426143}
   m_ConstrainProportionsScale: 0
   m_Children:
