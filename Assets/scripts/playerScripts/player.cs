@@ -28,7 +28,7 @@ public class player : MonoBehaviour
     GameObject damage;
     GameObject colideObject;
     bool isGrounded;
-    public float jumpForce = 0.7f;
+    public float jumpForce = 50f;
     Rigidbody rb;
     public string work;
     InventoryItem[] inventory = new InventoryItem[8];
@@ -49,6 +49,7 @@ public class player : MonoBehaviour
     bool lockedPlayer = false;
     Dictionary<InventoryItem, int> smokedcigarettes = new Dictionary<InventoryItem, int>();
     int ids = 0;
+    Animator walkAnimation;
     float mapSizeX = 151.856f;
     float mapSizeZ = 95.52282f;
 
@@ -68,6 +69,7 @@ public class player : MonoBehaviour
         nullObject = GameObject.Find("null");
         hangryEl = GameObject.Find("hangryBar").GetComponent<RectTransform>();
         startHangry = hangryEl.anchoredPosition.x;
+        walkAnimation = transform.parent.GetComponent<Animator>();
         Debug.Log(startHangry);
         for (int i = 0; i < 8; i++)
         {
@@ -173,7 +175,12 @@ public class player : MonoBehaviour
         float value = startHangry - (605 - hangry);
         hangryEl.anchoredPosition = new Vector2(value, hangryEl.anchoredPosition.y);
 
-        
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded == true)
+        {
+            speedhangry = 2;
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            speedhangry = 5;
+        }
         if (Keyboard.current.leftShiftKey.isPressed)
         { 
             speed = 15f;
@@ -254,7 +261,7 @@ public class player : MonoBehaviour
     }
     void FixedUpdate()
     {
-        
+        bool isMoving = false;
         Vector3 move = Vector3.zero;
 
         Vector3 forward = Camera.main.transform.forward;
@@ -270,26 +277,28 @@ public class player : MonoBehaviour
         if (Keyboard.current.wKey.isPressed)
         {
             move += forward;
+            move += forward;
         }
         if (Keyboard.current.sKey.isPressed)
         {
+            move += forward;
             move -= forward;
         }
         if (Keyboard.current.aKey.isPressed)
         {
+            move += forward;
             move -= right;
         }
         if (Keyboard.current.dKey.isPressed)
         {
+            move += forward;
             move += right;
         }
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            speedhangry = 2;
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            speedhangry = 5;
-        }
 
+        if (walkAnimation != null)
+        {
+            walkAnimation.SetBool("isWalking", isMoving);
+        }
         transform.parent.position += move.normalized * speed * Time.fixedDeltaTime;
     }
     IEnumerator ShowDamageScreen()
@@ -310,14 +319,15 @@ public class player : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log(other.tag);
         if (mapObject == null)
         {
             mapObject = other.gameObject;
         }
         if (other.CompareTag("ground"))
         {
-            groundContacts++;
             isGrounded = true;
+            Debug.Log(isGrounded);
         }
 
         if (other.CompareTag("damage"))
@@ -340,6 +350,8 @@ public class player : MonoBehaviour
             lockedPlayer = true;
             if (other.gameObject.name == "robert")
             {
+                novell.transform.Find("Button1").GetComponent<UnityEngine.UI.Button>().onClick.RemoveAllListeners();
+                novell.transform.Find("Button2").GetComponent<UnityEngine.UI.Button>().onClick.RemoveAllListeners();
                 novell.alpha = 1;
                 novell.transform.Find("text").GetComponent<TextMeshProUGUI>().text = "Robert: привет я Роберт продавец запрещеных вещей, хотите ли вы чтото купить?";
                 novell.transform.Find("Button1").GetComponentInChildren<TextMeshProUGUI>().text = "Да";
@@ -358,11 +370,19 @@ public class player : MonoBehaviour
                         if (money >= 20)
                         {
                             money -= 20;
-                            InventoryItem sugar = new InventoryItem();
-                            sugar.prefab = Resources.Load<GameObject>("Prefabs/sugar");
-                            sugar.id = Guid.NewGuid().ToString();
-                            sugar.image = Resources.Load<Sprite>("sprites/sugar");
-                            inventory[0] = sugar;
+                            for (int i = 0; i < 8; i++)
+                            {
+                                if (inventory[i].prefab == nullObject)
+                                {
+                                    InventoryItem sugar = new InventoryItem();
+                                    sugar.prefab = Resources.Load<GameObject>("Prefabs/sugar");
+                                    sugar.id = Guid.NewGuid().ToString();
+                                    sugar.image = Resources.Load<Sprite>("sprites/sugar");
+                                    inventory[0] = sugar;
+                                    break;
+                                }
+                            }
+                            
                         }
                     });
                     novell.transform.Find("Button2").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() =>
@@ -431,13 +451,7 @@ public class player : MonoBehaviour
     {
         if (other.CompareTag("ground"))
         {
-            groundContacts--;
-
-            if (groundContacts <= 0)
-            {
-                groundContacts = 0;
-                isGrounded = false;
-            }
+            isGrounded = false;
         }
 
         if (other.CompareTag("shop"))

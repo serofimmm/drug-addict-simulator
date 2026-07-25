@@ -8390,10 +8390,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.24104775
-  m_Height: 2.0741403
+  m_Radius: 0.51425415
+  m_Height: 2.1446097
   m_Direction: 1
-  m_Center: {x: -0.012351237, y: -0.002349189, z: 0.042125218}
+  m_Center: {x: -0.012351237, y: -0.037584376, z: -0.061236717}
 --- !u!1 &2053193398
 GameObject:
   m_ObjectHideFlags: 0
@@ -9684,6 +9684,7 @@ GameObject:
   - component: {fileID: 1840377706356929002}
   - component: {fileID: 1840377706356929004}
   - component: {fileID: 1840377706356929003}
+  - component: {fileID: 1840377706356929005}
   m_Layer: 0
   m_Name: player
   m_TagString: Untagged
@@ -10021,6 +10022,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!95 &1840377706356929005
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351508051173288784}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1c5ea88c72077a846b4285a547adb83a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!4 &1867677359361438243
 Transform:
   m_ObjectHideFlags: 0
