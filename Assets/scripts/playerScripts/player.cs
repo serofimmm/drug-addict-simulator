@@ -261,9 +261,9 @@ public class player : MonoBehaviour
     }
     void FixedUpdate()
     {
-        bool isMoving = false;
+        
         Vector3 move = Vector3.zero;
-
+        
         Vector3 forward = Camera.main.transform.forward;
         Vector3 right = Camera.main.transform.right;
 
@@ -294,10 +294,11 @@ public class player : MonoBehaviour
             move += forward;
             move += right;
         }
-
+        bool isMoving = move.sqrMagnitude > 0.01f;
         if (walkAnimation != null)
         {
             walkAnimation.SetBool("isWalking", isMoving);
+            Debug.Log("isMoving равен: "+isMoving);
         }
         transform.parent.position += move.normalized * speed * Time.fixedDeltaTime;
     }
