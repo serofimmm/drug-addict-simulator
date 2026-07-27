@@ -281,7 +281,7 @@ public class player : MonoBehaviour
         }
         if (Keyboard.current.sKey.isPressed)
         {
-            move += forward;
+            
             move -= forward;
         }
         if (Keyboard.current.aKey.isPressed)

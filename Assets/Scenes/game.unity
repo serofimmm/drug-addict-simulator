@@ -1772,7 +1772,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 1
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -1801,7 +1801,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.010247507, y: 0.71932185, z: -0.025297495, w: 0.69414055}
-  m_LocalPosition: {x: 0.05, y: 0.78, z: -0.1}
+  m_LocalPosition: {x: 0.29, y: 0.77, z: -0.11}
   m_LocalScale: {x: 2.9179738, y: 3.20877, z: 2.918601}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11795,8 +11795,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 4998699084995691032}
   m_AABB:
-    m_Center: {x: 0.010560691, y: 0.6817306, z: -1.2689046}
-    m_Extent: {x: 0.7249115, y: 1.9302522, z: 0.5342573}
+    m_Center: {x: 2, y: 2, z: 2}
+    m_Extent: {x: 2, y: 2, z: 2}
   m_DirtyAABB: 0
 --- !u!4 &7130498356910343769
 Transform:
@@ -12544,7 +12544,7 @@ Transform:
   m_GameObject: {fileID: 8868452380862088034}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7383535, y: -0.6740619, z: -0.021244079, w: -0.004844904}
-  m_LocalPosition: {x: -0.025, y: -0.244, z: 0.121}
+  m_LocalPosition: {x: -0.01, y: -0.24, z: -0}
   m_LocalScale: {x: 0.3118942, y: 0.34241933, z: 0.3426143}
   m_ConstrainProportionsScale: 0
   m_Children:
