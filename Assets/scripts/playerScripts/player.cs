@@ -18,7 +18,8 @@ public class player : MonoBehaviour
     private float yRotation;
 
     private int groundContacts = 0;
-
+    Vector3[] redPoints = {new Vector3(29.67535f, -1.5f, 17.06004f), new Vector3(24, -1.5f, 7.93f), new Vector3(26.96f, -1.5f, 29.29f)};
+    Vector3[] greenPoints = { new Vector3(-1.265007f, -1.5f, 15.96755f), new Vector3(-0.41f, -1.5f, 7), new Vector3(-1.05f, -1.5f, 28.42f) };
     public float speed = 5f;
     public int hp = 100;
     private hpbar script;
@@ -50,6 +51,7 @@ public class player : MonoBehaviour
     Dictionary<InventoryItem, int> smokedcigarettes = new Dictionary<InventoryItem, int>();
     int ids = 0;
     Animator walkAnimation;
+    int destroyBox = 0;
     float mapSizeX = 151.856f;
     float mapSizeZ = 95.52282f;
 
@@ -133,24 +135,8 @@ public class player : MonoBehaviour
         }
         if (work == "loader" && GameObject.Find("punktA(Clone)") == null)
         {
-            Collider col = mapObject.GetComponent<Collider>();
-
-            Vector3 min = col.bounds.min;
-            Vector3 max = col.bounds.max;
-            float randomX1 = UnityEngine.Random.Range(min.x, max.x);
-            float randomZ1 = UnityEngine.Random.Range(min.z, max.z);
-
-            float randomX2 = UnityEngine.Random.Range(min.x, max.x);
-            float randomZ2 = UnityEngine.Random.Range(min.z, max.z);
-            while (Vector3.Distance(new Vector3(randomX2, -1.5f, randomZ2), new Vector3(randomX1, -1.5f, randomZ1)) >= 20)
-            {
-                randomX2 = UnityEngine.Random.Range(min.x, max.x);
-                randomZ2 = UnityEngine.Random.Range(min.z, max.z);
-            }
-            
-            Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(randomX1, -1.5f, randomZ1), Quaternion.identity);
-            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(randomX2, -1.5f, randomZ2), Quaternion.identity);
-            Debug.Log("заспавнены на ("+randomX1+","+randomZ1+")(" + randomX2 + "," + randomZ2 + ")");
+            Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-5, -1.5f, 19), Quaternion.identity);
+            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(3.5f, -1.4f, 10), Quaternion.identity);
         }
         if(inventory[selectedSlot].prefab != nullObject)
         {
@@ -433,6 +419,8 @@ public class player : MonoBehaviour
                     break;
                 }
             }
+            Destroy(GameObject.Find("semi-truck").transform.Find("box ("+destroyBox+")"));
+            destroyBox++;
         }
 
         if (other.gameObject.name == "punktB(Clone)")
@@ -446,6 +434,9 @@ public class player : MonoBehaviour
                     break;
                 }
             }
+            GameObject box = Instantiate(Resources.Load<GameObject>("Prefabs/box"), GameObject.Find("palet").transform);
+            box.transform.localScale = new Vector3(1, 1, 1.5f);
+            box.transform.position = new Vector3(GameObject.Find("palet").transform.position.x, -0.5f+destroyBox*1-1, GameObject.Find("palet").transform.position.z);
         }
     }
     void OnTriggerExit(Collider other)
