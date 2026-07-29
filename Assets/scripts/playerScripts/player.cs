@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using TMPro.Examples;
@@ -19,7 +20,7 @@ public class player : MonoBehaviour
 
     private int groundContacts = 0;
     Vector3[] redPoints = {new Vector3(29.67535f, -1.5f, 17.06004f), new Vector3(24, -1.5f, 7.93f), new Vector3(26.96f, -1.5f, 29.29f)};
-    Vector3[] greenPoints = { new Vector3(-1.265007f, -1.5f, 15.96755f), new Vector3(-0.41f, -1.5f, 7), new Vector3(-1.05f, -1.5f, 28.42f) };
+    Vector3[] greenPoints = { new Vector3(12.39252f, -1.3f, 27.86517f), new Vector3(12.39252f, -1.3f, 18.97f), new Vector3(12.39252f, -1.3f, 11.52f), new Vector3(12.39252f, -1.3f, 5.22f) };
     public float speed = 5f;
     public int hp = 100;
     private hpbar script;
@@ -89,7 +90,9 @@ public class player : MonoBehaviour
         cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
         inventory[1] = cigarette;
         int id = randomID();
-        
+        GameObject boxes = Instantiate(Resources.Load<GameObject>("Prefabs/boxes"), GameObject.Find("palet").transform);
+        boxes.transform.position = new Vector3(GameObject.Find("palet").transform.position.x, GameObject.Find("palet").transform.position.y + 0.2614f
+            , GameObject.Find("palet").transform.position.z);
         smokedcigarettes[cigarette] = 1;
         StartCoroutine(hangrytick());
     }
@@ -118,7 +121,6 @@ public class player : MonoBehaviour
                 float scaleX = item.prefab.transform.localScale.x;
                 float scaleY = item.prefab.transform.localScale.y;
                 float scaleZ = item.prefab.transform.localScale.z;
-                Debug.Log(scaleX + " " + scaleY + " " + scaleZ);
                 GameObject itemN = Instantiate(inventory[selectedSlot].prefab, hand.transform.Find("item"));
                 itemN.transform.localPosition = Vector3.zero;
                 itemN.transform.localRotation = Quaternion.identity;
@@ -135,8 +137,16 @@ public class player : MonoBehaviour
         }
         if (work == "loader" && GameObject.Find("punktA(Clone)") == null)
         {
-            Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-5, -1.5f, 19), Quaternion.identity);
-            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), new Vector3(3.5f, -1.4f, 10), Quaternion.identity);
+            Vector3 rand = greenPoints[UnityEngine.Random.Range(0, greenPoints.Length)];
+            Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-0.2341937f, -1.3f, 19.39402f), Quaternion.identity);
+            Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), rand, Quaternion.identity);
+        }
+        if (destroyBox == 22)
+        {
+            GameObject boxes = Instantiate(Resources.Load<GameObject>("Prefabs/boxes"), GameObject.Find("palet").transform);
+            boxes.transform.position = new Vector3(GameObject.Find("palet").transform.position.x, GameObject.Find("palet").transform.position.y + 0.2614f
+                , GameObject.Find("palet").transform.position.z);
+            destroyBox = 0;
         }
         if(inventory[selectedSlot].prefab != nullObject)
         {
@@ -168,13 +178,13 @@ public class player : MonoBehaviour
             speedhangry = 5;
         }
         if (Keyboard.current.leftShiftKey.isPressed)
-        { 
-            speed = 15f;
+        {
+            speed += 15f;
             speedhangry = 2;
         }
         if (Keyboard.current.leftShiftKey.wasReleasedThisFrame)
         {
-            speed = 5f;
+            speed -= 15f;
             speedhangry = 5;
         }
         if (transform.parent.position.y <= -40f)
@@ -284,7 +294,6 @@ public class player : MonoBehaviour
         if (walkAnimation != null)
         {
             walkAnimation.SetBool("isWalking", isMoving);
-            Debug.Log("isMoving равен: "+isMoving);
         }
         transform.parent.position += move.normalized * speed * Time.fixedDeltaTime;
     }
@@ -406,21 +415,40 @@ public class player : MonoBehaviour
 
         if (other.gameObject.name == "punktA(Clone)")
         {
-            for (int i = 0; i < 8; i++)
+            int count = 0;
+            foreach (InventoryItem n in inventory)
             {
-                if (inventory[i].prefab == nullObject)
+                if(n != null && n.prefab != nullObject)
                 {
-                    InventoryItem box = new InventoryItem();
-                    box.prefab = Resources.Load<GameObject>("Prefabs/box");
-                    box.id = Guid.NewGuid().ToString();
-                    box.image = Resources.Load<Sprite>("sprites/box");
-                    inventory[i] = box;
-                    selectedSlot = i;
-                    break;
+                    if (n.prefab.name == "box(Clone)")
+                    {
+                        count++;
+                    }
                 }
             }
-            Destroy(GameObject.Find("semi-truck").transform.Find("box ("+destroyBox+")"));
-            destroyBox++;
+            if(count < 5)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    if (inventory[i].prefab == nullObject)
+                    {
+                        InventoryItem box = new InventoryItem();
+                        box.prefab = Resources.Load<GameObject>("Prefabs/box");
+                        box.id = Guid.NewGuid().ToString();
+                        box.image = Resources.Load<Sprite>("sprites/box");
+                        inventory[i] = box;
+                        selectedSlot = i;
+                        speed -= 0.5f;
+                        break;
+                    }
+                }
+
+                Debug.Log("box (" + (22 - destroyBox) + ")");
+                Destroy(GameObject.Find("boxes(Clone)").transform.Find("box (" + (22 - destroyBox) + ")").gameObject);
+                destroyBox++;
+            }
+           
+            
         }
 
         if (other.gameObject.name == "punktB(Clone)")
@@ -431,12 +459,14 @@ public class player : MonoBehaviour
                 {
                     inventory[i].prefab = nullObject;
                     money += 10;
+                    speed += 0.5f;
+                    Destroy(GameObject.Find("punktB(Clone)"));
+                    Vector3 rand = greenPoints[UnityEngine.Random.Range(0, greenPoints.Length)];
+                    Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), rand, Quaternion.identity);
                     break;
                 }
             }
-            GameObject box = Instantiate(Resources.Load<GameObject>("Prefabs/box"), GameObject.Find("palet").transform);
-            box.transform.localScale = new Vector3(1, 1, 1.5f);
-            box.transform.position = new Vector3(GameObject.Find("palet").transform.position.x, -0.5f+destroyBox*1-1, GameObject.Find("palet").transform.position.z);
+            
         }
     }
     void OnTriggerExit(Collider other)
