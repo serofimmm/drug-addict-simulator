@@ -2038,7 +2038,7 @@ GameObject:
   - component: {fileID: 258990025}
   m_Layer: 0
   m_Name: Cube (3)
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7285,7 +7285,7 @@ GameObject:
   - component: {fileID: 941247093}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -18966,7 +18966,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8868452380862088034}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.5449042, y: -0.45248252, z: 0.5095826, w: 0.4885332}
+  m_LocalRotation: {x: -0.544904, y: -0.45248252, z: 0.50958276, w: 0.48853317}
   m_LocalPosition: {x: 0.25265458, y: 0.39482176, z: -0.06377388}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -18985,20 +18985,20 @@ ParentConstraint:
   m_Enabled: 1
   serializedVersion: 2
   m_Weight: 1
-  m_TranslationAtRest: {x: -0.01, y: -0.24, z: -0}
-  m_RotationAtRest: {x: -178.769, y: -2.1730042, z: -84.76401}
+  m_TranslationAtRest: {x: 0.25265458, y: 0.39482176, z: -0.06377388}
+  m_RotationAtRest: {x: -4.0859666, y: -90.19082, z: 96.51587}
   m_TranslationOffsets:
-  - {x: 0, y: 0, z: 0}
+  - {x: -0.0100004375, y: -0.26392853, z: 0}
   m_RotationOffsets:
-  - {x: 0, y: 0, z: 0}
-  m_AffectTranslationX: 1
-  m_AffectTranslationY: 1
-  m_AffectTranslationZ: 1
+  - {x: -1.2310933, y: 177.82732, z: 95.23583}
+  m_AffectTranslationX: 0
+  m_AffectTranslationY: 0
+  m_AffectTranslationZ: 0
   m_AffectRotationX: 1
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
-  m_Active: 0
-  m_IsLocked: 0
+  m_Active: 1
+  m_IsLocked: 1
   m_Sources:
   - sourceTransform: {fileID: 330585546}
     weight: 1

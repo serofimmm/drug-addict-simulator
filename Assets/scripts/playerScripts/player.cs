@@ -90,9 +90,7 @@ public class player : MonoBehaviour
         cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
         inventory[1] = cigarette;
         int id = randomID();
-        GameObject boxes = Instantiate(Resources.Load<GameObject>("Prefabs/boxes"), GameObject.Find("palet").transform);
-        boxes.transform.position = new Vector3(GameObject.Find("palet").transform.position.x, GameObject.Find("palet").transform.position.y + 0.2614f
-            , GameObject.Find("palet").transform.position.z);
+        
         smokedcigarettes[cigarette] = 1;
         StartCoroutine(hangrytick());
     }
@@ -140,6 +138,10 @@ public class player : MonoBehaviour
             Vector3 rand = greenPoints[UnityEngine.Random.Range(0, greenPoints.Length)];
             Instantiate(Resources.Load<GameObject>("Prefabs/punktA"), new Vector3(-0.2341937f, -1.3f, 19.39402f), Quaternion.identity);
             Instantiate(Resources.Load<GameObject>("Prefabs/punktB"), rand, Quaternion.identity);
+            GameObject boxes = Instantiate(Resources.Load<GameObject>("Prefabs/boxes"), GameObject.Find("palet").transform);
+            boxes.transform.position = new Vector3(GameObject.Find("palet").transform.position.x, GameObject.Find("palet").transform.position.y + 0.2614f
+                , GameObject.Find("palet").transform.position.z);
+            boxes.transform.localScale = new Vector3(0.5f, 6, 1.1f);
         }
         if (destroyBox == 22)
         {
@@ -179,13 +181,19 @@ public class player : MonoBehaviour
         }
         if (Keyboard.current.leftShiftKey.isPressed)
         {
-            speed += 15f;
-            speedhangry = 2;
+            if(speed == 5f)
+            {
+                speed += 15f;
+                speedhangry = 2;
+            }
         }
         if (Keyboard.current.leftShiftKey.wasReleasedThisFrame)
         {
-            speed -= 15f;
-            speedhangry = 5;
+            if(speed == 20f)
+            {
+                speed -= 15f;
+                speedhangry = 5;
+            }
         }
         if (transform.parent.position.y <= -40f)
         {
