@@ -1,7 +1,13 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using TMPro.Examples;
@@ -9,7 +15,9 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class player : MonoBehaviour
 {
@@ -45,6 +53,7 @@ public class player : MonoBehaviour
     public int hangry = 100;
     int speedhangry = 5;
     GameObject head;
+    float sendTimer = 0f;
     RectTransform hangryEl;
     float startHangry;
     GameObject mapObject;
@@ -55,9 +64,24 @@ public class player : MonoBehaviour
     int destroyBox = 0;
     float mapSizeX = 151.856f;
     float mapSizeZ = 95.52282f;
+    TcpClient client = new TcpClient("localhost", 8080);
+    NetworkStream stream;
+    string name;
+    string jsonChunk;
 
-    void Start()
+
+    private void Awake()
     {
+        if (SceneManager.GetActiveScene().name == "menu")
+        {
+            this.enabled = false;
+            return;
+        }
+    }
+    async Task Start()
+    {
+        if (SceneManager.GetActiveScene().name == "menu") return;
+        name = startGame.name.Replace("\u200B", "");
         Cursor.visible = false;
         script = GameObject.Find("hpbar").GetComponent<hpbar>();
         balance = GameObject.Find("money").GetComponent<TextMeshProUGUI>();
@@ -74,6 +98,7 @@ public class player : MonoBehaviour
         startHangry = hangryEl.anchoredPosition.x;
         walkAnimation = transform.parent.GetComponent<Animator>();
         Debug.Log(startHangry);
+        stream = client.GetStream();
         for (int i = 0; i < 8; i++)
         {
             inventory[i] = new InventoryItem();
@@ -90,14 +115,48 @@ public class player : MonoBehaviour
         cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
         inventory[1] = cigarette;
         int id = randomID();
-        
         smokedcigarettes[cigarette] = 1;
         StartCoroutine(hangrytick());
+        if(SceneManager.GetActiveScene().name == "multiplayer")
+        {
+            StartCoroutine(SendPostRequest("{\"type\":\"join\",\"session\":\"" + name + "\"}"));
+            string message = getMessage();
+            if (message != null)
+            {
+                foreach (string i in message.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    JObject data = JObject.Parse(i);
+                    string type = data["type"]?.ToString();
+
+                    if (type == "update")
+                    {
+                        List<Player> players = data["data"].ToObject<List<Player>>();
+                        foreach (Player player in players)
+                        {
+                            if (player.Id != name)
+                            {
+                                GameObject p = Instantiate(Resources.Load<GameObject>("Prefabs/network player"), new Vector3(player.X, player.Y, player.Z), Quaternion.identity);
+                                p.transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
+                                p.name = player.Id;
+                            }
+                            else
+                            {
+                                transform.parent.position = new Vector3(player.X, player.Y, player.Z);
+                                transform.parent.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
     }
 
     void Update()
     {
-        for(int i = 0; i < 8; i++)
+        if (SceneManager.GetActiveScene().name == "menu") return;
+        for 
+            (int i = 0; i < 8; i++)
         {
             if(inventory[i].prefab != nullObject)
             {
@@ -167,7 +226,8 @@ public class player : MonoBehaviour
                 }
             }
         }
-            Vector2 mousePos = Mouse.current.position.ReadValue();
+        
+        Vector2 mousePos = Mouse.current.position.ReadValue();
         script.fill = hp;
         balance.text = money + "$";
         float value = startHangry - (605 - hangry);
@@ -265,9 +325,9 @@ public class player : MonoBehaviour
     }
     void FixedUpdate()
     {
-        
+        if (SceneManager.GetActiveScene().name == "menu") return;
         Vector3 move = Vector3.zero;
-        
+        sendTimer += Time.fixedDeltaTime;
         Vector3 forward = Camera.main.transform.forward;
         Vector3 right = Camera.main.transform.right;
 
@@ -285,7 +345,6 @@ public class player : MonoBehaviour
         }
         if (Keyboard.current.sKey.isPressed)
         {
-            
             move -= forward;
         }
         if (Keyboard.current.aKey.isPressed)
@@ -297,6 +356,64 @@ public class player : MonoBehaviour
         {
             move += forward;
             move += right;
+        }
+        if (sendTimer >= 0.1f)
+        {
+            sendTimer = 0f;
+            if(SceneManager.GetActiveScene().name == "multiplayer")
+            {
+                string pos = "{"
+            + "\"type\":\"move\","
+            + "\"session\":\"" + name + "\","
+            + "\"x\":" + transform.parent.position.x.ToString(CultureInfo.InvariantCulture) + ","
+            + "\"y\":" + transform.parent.position.y.ToString(CultureInfo.InvariantCulture) + ","
+            + "\"z\":" + transform.parent.position.z.ToString(CultureInfo.InvariantCulture)
+            + "}";
+
+                StartCoroutine(SendPostRequest(pos));
+                string message = getMessage();
+                Debug.Log("пакет " + message);
+                if (message != null)
+                {
+                    if (jsonChunk != null)
+                    {
+                        message = jsonChunk + message;
+                        jsonChunk = null;
+                    }
+                    if (!message.EndsWith("\n"))
+                    {
+                        jsonChunk = message;
+                        return;
+                    }
+                    foreach (string i in message.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        JObject data = JObject.Parse(i);
+                        string type = data["type"]?.ToString();
+
+                        if (type == "update")
+                        {
+                            List<Player> players = data["data"].ToObject<List<Player>>();
+                            foreach (Player player in players)
+                            {
+                                if (player.Id != name)
+                                {
+                                    if (GameObject.Find(player.Id) == null)
+                                    {
+                                        GameObject p = Instantiate(Resources.Load<GameObject>("Prefabs/network player"), new Vector3(player.X, player.Y, player.Z), Quaternion.identity);
+                                        p.transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
+                                        p.name = player.Id;
+                                    }
+                                    else
+                                    {
+                                        GameObject.Find(player.Id).transform.position = new Vector3(player.X, player.Y, player.Z);
+                                        GameObject.Find(player.Id).transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         bool isMoving = move.sqrMagnitude > 0.01f;
         if (walkAnimation != null)
@@ -491,6 +608,39 @@ public class player : MonoBehaviour
             lockedPlayer = false;
         }
     }
+    IEnumerator SendPostRequest(string json)
+    {
+        if (client != null && client.Connected && stream != null && stream.CanWrite)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(json + "\n");
+            Debug.Log("отправляем на сервер : " + json);
+            stream.Write(data);
+            Debug.Log("отправлено");
+            yield return null;
+        }
+    }
+
+    private string getMessage()
+    {
+        if (stream == null || !stream.CanRead || !stream.DataAvailable)
+        {
+            return null;
+        }
+        try
+        {
+            byte[] buffer = new byte[4096];
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+            if (bytesRead > 0)
+            {
+                return Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            }
+        }
+        catch
+        {
+
+        }
+        return null;
+    }
     int randomID()
     {
         return ids++;
@@ -502,4 +652,15 @@ public class InventoryItem
     public GameObject prefab;
     public string id;
     public Sprite image;
+}
+
+public class Player
+{
+    public string Id { get; set; }
+    public float X { get; set; }
+    public float Y { get; set; }
+    public float Z { get; set; }
+    public float RotX { get; set; }
+    public float RotY { get; set; }
+    public float RotZ { get; set; }
 }
