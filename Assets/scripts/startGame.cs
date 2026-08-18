@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class startGame : MonoBehaviour
 {
-    public static string name;
+    public static string playerName;
     void Start()
     {
         
@@ -20,11 +20,16 @@ public class startGame : MonoBehaviour
     {
        SceneManager.LoadScene("game");
         Debug.Log("Game started");
-        startGame.name = GameObject.Find("name").transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().text;
+        startGame.playerName = GameObject.Find("name").transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().text;
     }
     public void startMultiplayer()
     {
         SceneManager.LoadScene("multiplayer");
-        startGame.name = GameObject.Find("name").transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().text;
+        startGame.playerName = GameObject.Find("name").transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().text;
+    }
+
+    public void exitGame()
+    {
+        SceneManager.LoadScene("menu");
     }
 }
