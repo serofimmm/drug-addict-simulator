@@ -12,16 +12,12 @@ using System.Threading.Tasks;
 using TMPro;
 using TMPro.Examples;
 using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
-using static UnityEditor.U2D.ScriptablePacker;
 
 public class player : MonoBehaviour
 {
@@ -33,6 +29,7 @@ public class player : MonoBehaviour
     private int groundContacts = 0;
     Vector3[] redPoints = {new Vector3(29.67535f, -1.5f, 17.06004f), new Vector3(24, -1.5f, 7.93f), new Vector3(26.96f, -1.5f, 29.29f)};
     Vector3[] greenPoints = { new Vector3(12.39252f, -1.3f, 27.86517f), new Vector3(12.39252f, -1.3f, 18.97f), new Vector3(12.39252f, -1.3f, 11.52f), new Vector3(12.39252f, -1.3f, 5.22f) };
+    private Dictionary<string, GameObject> spawnedPlayers = new Dictionary<string, GameObject>();
     public float speed = 5f;
     public int hp = 100;
     private hpbar script;
@@ -61,6 +58,7 @@ public class player : MonoBehaviour
     RectTransform hangryEl;
     float startHangry;
     GameObject mapObject;
+    GameObject menu;
     bool lockedPlayer = false;
     Dictionary<string, int> smokedcigarettes = new Dictionary<string, int>();
     int ids = 0;
@@ -78,6 +76,7 @@ public class player : MonoBehaviour
 
     private void Awake()
     {
+        Application.runInBackground = true;
         if (SceneManager.GetActiveScene().name == "menu")
         {
             this.enabled = false;
@@ -101,6 +100,8 @@ public class player : MonoBehaviour
         rb = transform.parent.GetComponent<Rigidbody>();
         hand = GameObject.Find("hand");
         head = GameObject.Find("head");
+        menu = GameObject.Find("menu");
+        menu.SetActive(false);
         novell = GameObject.Find("novell").GetComponent<CanvasGroup>();
         Debug.Log(novell.name);
         nullObject = GameObject.Find("null");
@@ -133,9 +134,9 @@ public class player : MonoBehaviour
                     if (type == "update")
                     {
                         List<Player> players = data["data"].ToObject<List<Player>>();
-                        while(data.ToString() == "[]")
+                        while((data["data"] is JArray array && array.Count == 0))
                         {
-                            
+                            players = JObject.Parse(i)["data"].ToObject<List<Player>>();
                         }
                         foreach (Player player in players)
                         {
@@ -336,19 +337,19 @@ public class player : MonoBehaviour
         }
         if(Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            if(GameObject.Find("menu").GetComponent<CanvasGroup>().alpha == 0)
+            if(menu.GetComponent<CanvasGroup>().alpha == 0)
             {
-                GameObject.Find("menu").GetComponent<CanvasGroup>().alpha = 1;
+                menu.GetComponent<CanvasGroup>().alpha = 1;
                 Cursor.visible = true;
                 lockedPlayer = true;
-                GameObject.Find("menu").transform.gameObject.SetActive(true);
+                menu.transform.gameObject.SetActive(true);
             }
             else
             {
-                GameObject.Find("menu").GetComponent<CanvasGroup>().alpha = 0;
+                menu.GetComponent<CanvasGroup>().alpha = 0;
                 Cursor.visible = false;
                 lockedPlayer = false;
-                GameObject.Find("menu").transform.gameObject.SetActive(false);
+                menu.transform.gameObject.SetActive(false);
             }
             
             
@@ -471,10 +472,12 @@ public class player : MonoBehaviour
                         if (type == "update")
                         {
                             List<Player> players = data["data"].ToObject<List<Player>>();
+                            HashSet<string> names = new HashSet<string>();
                             foreach (Player player in players)
                             {
                                 if (player.Id != playerName)
                                 {
+                                    names.Add(player.Id);
                                     if (GameObject.Find(player.Id) == null)
                                     {
                                         GameObject p = Instantiate(Resources.Load<GameObject>("Prefabs/network player"), new Vector3(player.X, player.Y, player.Z), Quaternion.identity);
@@ -484,13 +487,14 @@ public class player : MonoBehaviour
                                         itemN.transform.localPosition = Vector3.zero;
                                         itemN.transform.localRotation = Quaternion.identity;
                                         itemN.transform.localScale = new Vector3(1, 1, 1);
-                                        
+                                        spawnedPlayers[player.Id] = p;
                                     }
                                     else
                                     {
                                         GameObject.Find(player.Id).transform.position = new Vector3(player.X, player.Y, player.Z);
                                         GameObject.Find(player.Id).transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
                                     }
+                                    
                                 }
                                 hp = player.hp;
                                 for(int n = 0; n < player.inventory.Length; n++)
@@ -518,6 +522,16 @@ public class player : MonoBehaviour
                                 money = player.money;
 
                             }
+                            List<string> diskonected = spawnedPlayers.Keys.Except(names).ToList();
+                            foreach (string name in diskonected)
+                            {
+                                if (spawnedPlayers[name] != null)
+                                {
+                                    Destroy(spawnedPlayers[name]);
+                                }
+                                spawnedPlayers.Remove(name);
+                            }
+                            
                         }
                     }
                 }
