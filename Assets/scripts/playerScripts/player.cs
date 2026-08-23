@@ -496,8 +496,8 @@ public class player : MonoBehaviour
                                     else
                                     {
                                         Debug.Log(spawnedPlayers[player.Id].name);
-                                        spawnedPlayers[player.Id].transform.position = new Vector3(player.X, player.Y, player.Z);
-                                        spawnedPlayers[player.Id].transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
+                                        spawnedPlayers[player.Id].transform.position = Vector3.Lerp(spawnedPlayers[player.Id].transform.position, new Vector3(player.X, player.Y, player.Z), 10f * Time.fixedDeltaTime);
+                                        spawnedPlayers[player.Id].transform.rotation = Quaternion.Lerp(spawnedPlayers[player.Id].transform.rotation, Quaternion.Euler(player.RotX, player.RotY, player.RotZ), 10f * Time.fixedDeltaTime);
                                     }
                                     
                                 }
