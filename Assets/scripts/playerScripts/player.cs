@@ -121,22 +121,22 @@ public class player : MonoBehaviour
             StartCoroutine(SendPostRequest("{\"type\":\"join\",\"session\":\"" + playerName + "\"}"));
             yield return StartCoroutine(initMUltiplayer());
             string dataS = null;
-            string message = getMessage();
+            string message = messsegeForMUltiplayer;
+            string[] m = message.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             if (message != null)
             {
                 Debug.Log("обработка");
                 
-                foreach (string i in message.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
+                if (message != null)
                 {
-                    JObject data = JObject.Parse(i);
+                    JObject data = JObject.Parse(message);
                     string type = data["type"]?.ToString();
-                    
                     if (type == "update")
                     {
                         List<Player> players = data["data"].ToObject<List<Player>>();
                         while((data["data"] is JArray array && array.Count == 0))
                         {
-                            players = JObject.Parse(i)["data"].ToObject<List<Player>>();
+                            players = JObject.Parse(message)["data"].ToObject<List<Player>>();
                         }
                         foreach (Player player in players)
                         {
@@ -156,6 +156,7 @@ public class player : MonoBehaviour
                                     GameObject p = Instantiate(Resources.Load<GameObject>("Prefabs/network player"), new Vector3(player.X, player.Y, player.Z), Quaternion.identity);
                                     p.transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
                                     p.name = player.Id;
+                                    spawnedPlayers[player.Id] = p;
                                 }
                             }
                         }
@@ -402,10 +403,6 @@ public class player : MonoBehaviour
     void FixedUpdate()
     {
         if (SceneManager.GetActiveScene().name == "menu") return;
-        if(SceneManager.GetActiveScene().name == "multiplayer")
-        {
-            if (positionInit != true) return;
-        }
         Vector3 move = Vector3.zero;
         sendTimer += Time.fixedDeltaTime;
         Vector3 forward = Camera.main.transform.forward;
@@ -442,15 +439,17 @@ public class player : MonoBehaviour
             sendTimer = 0f;
             if(SceneManager.GetActiveScene().name == "multiplayer")
             {
-                string pos = "{"
-            + "\"type\":\"move\","
-            + "\"session\":\"" + playerName + "\","
-            + "\"x\":" + transform.parent.position.x.ToString(CultureInfo.InvariantCulture) + ","
-            + "\"y\":" + transform.parent.position.y.ToString(CultureInfo.InvariantCulture) + ","
-            + "\"z\":" + transform.parent.position.z.ToString(CultureInfo.InvariantCulture)
-            + "}";
+                var pos = new
+                {
+                    type = "move",
+                    session = playerName,
+                    x = transform.parent.position.x,
+                    y = transform.parent.position.y,
+                    z = transform.parent.position.z,
+                    rot = transform.parent.eulerAngles.y
+                };
 
-                StartCoroutine(SendPostRequest(pos));
+                StartCoroutine(SendPostRequest(JsonConvert.SerializeObject(pos)));
                 string message = getMessage();
                 if (message != null)
                 {
@@ -478,49 +477,58 @@ public class player : MonoBehaviour
                                 if (player.Id != playerName)
                                 {
                                     names.Add(player.Id);
-                                    if (GameObject.Find(player.Id) == null)
+                                    if (!spawnedPlayers.ContainsKey(player.Id) || spawnedPlayers[player.Id] == null)
                                     {
+                                        Debug.Log("1. Начинаем спавн игрока: " + player.Id);
                                         GameObject p = Instantiate(Resources.Load<GameObject>("Prefabs/network player"), new Vector3(player.X, player.Y, player.Z), Quaternion.identity);
                                         p.transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
                                         p.name = player.Id;
-                                        GameObject itemN = Instantiate(Resources.Load<GameObject>("Prefabs/" + player.inventory[player.selectedSlot]), p.transform.Find("Armature").Find("туловице").Find("Bone.001").Find("Bone.002").Find("hand").Find("item"));
-                                        itemN.transform.localPosition = Vector3.zero;
-                                        itemN.transform.localRotation = Quaternion.identity;
-                                        itemN.transform.localScale = new Vector3(1, 1, 1);
+                                        GameObject item1 = p.transform.Find("Armature").gameObject;
+                                        GameObject item2 = item1.transform.Find("туловице").gameObject;
+                                        GameObject item3 = item2.transform.Find("Bone.001").gameObject;
+                                        GameObject item4 = item3.transform.Find("Bone.002").gameObject;
+                                        GameObject item5 = item4.transform.Find("hand").gameObject;
+                                        GameObject item6 = item5.transform.Find("item").gameObject;
+                                        
                                         spawnedPlayers[player.Id] = p;
+                                        Debug.Log("2. Успешно записано в словарь: " + player.Id);
                                     }
                                     else
                                     {
-                                        GameObject.Find(player.Id).transform.position = new Vector3(player.X, player.Y, player.Z);
-                                        GameObject.Find(player.Id).transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
+                                        Debug.Log(spawnedPlayers[player.Id].name);
+                                        spawnedPlayers[player.Id].transform.position = new Vector3(player.X, player.Y, player.Z);
+                                        spawnedPlayers[player.Id].transform.rotation = Quaternion.Euler(player.RotX, player.RotY, player.RotZ);
                                     }
                                     
                                 }
-                                hp = player.hp;
-                                for(int n = 0; n < player.inventory.Length; n++)
+                                else
                                 {
-                                    if (player.inventory[n] != null)
+                                    hp = player.hp;
+                                    for (int n = 0; n < player.inventory.Length; n++)
                                     {
-                                        InventoryItem inv = new InventoryItem();
-                                        inv.prefab = Resources.Load<GameObject>("Prefabs/" + player.inventory[n].prefab);
-                                        inv.image = Resources.Load<Sprite>("sprites/" + player.inventory[n].image);
-                                        inv.id = player.inventory[n].id;
-                                        if (player.inventory[n].prefab == "cigarettes")
+                                        if (player.inventory[n] != null)
                                         {
-                                            if (!smokedcigarettes.ContainsKey(inv.id))
+                                            InventoryItem inv = new InventoryItem();
+                                            inv.prefab = Resources.Load<GameObject>("Prefabs/" + player.inventory[n].prefab);
+                                            inv.image = Resources.Load<Sprite>("sprites/" + player.inventory[n].image);
+                                            inv.id = player.inventory[n].id;
+                                            if (player.inventory[n].prefab == "cigarettes")
                                             {
-                                                smokedcigarettes[inv.id] = 1;
+                                                if (!smokedcigarettes.ContainsKey(inv.id))
+                                                {
+                                                    smokedcigarettes[inv.id] = 1;
+                                                }
                                             }
+                                            inventory[n] = inv;
                                         }
-                                        inventory[n] = inv;
+                                        else
+                                        {
+                                            inventory[n].prefab = new GameObject();
+                                        }
                                     }
-                                    else
-                                    {
-                                        inventory[n].prefab = nullObject;
-                                    }
-                                }
-                                money = player.money;
+                                    money = player.money;
 
+                                }
                             }
                             List<string> diskonected = spawnedPlayers.Keys.Except(names).ToList();
                             foreach (string name in diskonected)
@@ -847,6 +855,7 @@ public class player : MonoBehaviour
             message = getMessage();
             yield return null;
         }
+        messsegeForMUltiplayer = message;
         Debug.Log("INIT получил пакет: " + message);
     }
     int randomID()
