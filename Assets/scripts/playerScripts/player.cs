@@ -18,6 +18,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Animations;
 
 public class player : MonoBehaviour
 {
@@ -72,6 +73,7 @@ public class player : MonoBehaviour
     string jsonChunk;
     bool positionInit = false;
     string messsegeForMUltiplayer = null;
+    Animation animator;
 
 
     private void Awake()
@@ -90,7 +92,7 @@ public class player : MonoBehaviour
         Cursor.visible = false;
         if(SceneManager.GetActiveScene().name == "multiplayer")
         {
-            client = new TcpClient("localhost", 8080);
+            client = new TcpClient(startGame.gameIp.Replace("\u200B", "").Replace("\uFEFF", "").Trim(), 8080);
         }
         script = GameObject.Find("hpbar").GetComponent<hpbar>();
         balance = GameObject.Find("money").GetComponent<TextMeshProUGUI>();
@@ -170,10 +172,11 @@ public class player : MonoBehaviour
     void Update()
     {
         if (SceneManager.GetActiveScene().name == "menu") return;
+        
         for 
             (int i = 0; i < 8; i++)
         {
-            if(inventory[i].prefab != nullObject)
+            if (inventory[i] != null && inventory[i].prefab != nullObject)
             {
                 GameObject.Find("inventory").transform.Find("inv block" + i).GetComponent<Image>().sprite = inventory[i].image;
             }
@@ -205,6 +208,10 @@ public class player : MonoBehaviour
         {
             Destroy(lastitem);
             lastitem = null;
+            if (inventory[selectedSlot] == null)
+            {
+                inventory[selectedSlot] = new InventoryItem();
+            }
             inventory[selectedSlot].prefab = nullObject;
         }
         if (work == "loader" && GameObject.Find("punktA(Clone)") == null)
@@ -281,7 +288,10 @@ public class player : MonoBehaviour
                 obj = hit.transform.gameObject;
                 nam = hit.transform.name;
             }
-            if(SceneManager.GetActiveScene().name == "multiplayer")
+            hand.GetComponent<ParentConstraint>().enabled = false;
+            animator.Play("punch");
+            hand.GetComponent<ParentConstraint>().enabled = true;
+            if (SceneManager.GetActiveScene().name == "multiplayer")
             {
                 var data = new
                 {

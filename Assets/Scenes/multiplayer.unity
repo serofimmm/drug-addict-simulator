@@ -14097,7 +14097,7 @@ CanvasGroup:
   m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
+  m_IgnoreParentGroups: 1
 --- !u!1 &1790692845
 GameObject:
   m_ObjectHideFlags: 0
@@ -19904,6 +19904,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8999794594668267600}
   - component: {fileID: 8999794594668267601}
+  - component: {fileID: 8999794594668267602}
   m_Layer: 0
   m_Name: hand
   m_TagString: Untagged
@@ -19988,6 +19989,28 @@ ParentConstraint:
   m_Sources:
   - sourceTransform: {fileID: 330585546}
     weight: 1
+--- !u!95 &8999794594668267602
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8868452380862088034}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1c5ea88c72077a846b4285a547adb83a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &9024468486648846641
 GameObject:
   m_ObjectHideFlags: 0
