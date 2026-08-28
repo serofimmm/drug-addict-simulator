@@ -279,6 +279,8 @@ public class player : MonoBehaviour
         }
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
+            hand.GetComponent<ParentConstraint>().constraintActive = false;
+            hand.GetComponent<Animator>().SetTrigger("isAtack");
             Ray ray = transform.Find("head").Find("head in").Find("Main Camera").GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             GameObject obj;
             string nam = "";
@@ -288,9 +290,6 @@ public class player : MonoBehaviour
                 obj = hit.transform.gameObject;
                 nam = hit.transform.name;
             }
-            hand.GetComponent<ParentConstraint>().enabled = false;
-            animator.Play("punch");
-            hand.GetComponent<ParentConstraint>().enabled = true;
             if (SceneManager.GetActiveScene().name == "multiplayer")
             {
                 var data = new

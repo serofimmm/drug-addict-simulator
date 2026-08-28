@@ -1,7 +1,7 @@
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
-
+using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -56,5 +56,9 @@ public class startGame : MonoBehaviour
         GameObject.Find("Camera").transform.position = new Vector3(-6.81f, 2.81f, 9.38f);
         GameObject.Find("buttons").GetComponent<CanvasGroup>().alpha = 1;
         GameObject.Find("buttons").GetComponent<CanvasGroup>().interactable = true;
+    }
+    public void EnableConstraint()
+    {
+        GameObject.Find("hand").GetComponent<ParentConstraint>().constraintActive = true;
     }
 }
