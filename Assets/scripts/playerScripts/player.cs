@@ -277,7 +277,7 @@ public class player : MonoBehaviour
                 speedhangry = 5;
             }
         }
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             hand.GetComponent<ParentConstraint>().constraintActive = false;
             hand.GetComponent<Animator>().SetTrigger("isAtack");
