@@ -19,6 +19,7 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Animations;
+using System.Net;
 
 public class player : MonoBehaviour
 {
@@ -90,10 +91,16 @@ public class player : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "menu") yield return null;
         playerName = startGame.playerName.Replace("\u200B", "").Replace("\uFEFF", "").Trim();
         Cursor.visible = false;
-        if(SceneManager.GetActiveScene().name == "multiplayer")
+        Debug.Log("1 дошел до подключения");
+        if (SceneManager.GetActiveScene().name == "multiplayer")
         {
-            client = new TcpClient(startGame.gameIp.Replace("\u200B", "").Replace("\uFEFF", "").Trim(), 8080);
+            Uri uri = new Uri("tcp://" + startGame.gameIp.Replace("\u200B", "").Replace("\uFEFF", "").Trim());
+            string host = uri.Host;
+            int port = uri.IsDefaultPort || uri.Port == -1 ? 7777 : uri.Port;
+            client = new TcpClient(host, port);
+            Debug.Log("Подключаюсь к: " + host + ":" + port);
         }
+        Debug.Log("2 подключение прошло");
         script = GameObject.Find("hpbar").GetComponent<hpbar>();
         balance = GameObject.Find("money").GetComponent<TextMeshProUGUI>();
         damage = GameObject.Find("damage");
@@ -250,6 +257,10 @@ public class player : MonoBehaviour
         }
         
         Vector2 mousePos = Mouse.current.position.ReadValue();
+        if (script == null)
+        {
+            Debug.LogError("SCRIPT NULL! hpbar не назначен");
+        }
         script.fill = hp;
         balance.text = money + "$";
         float value = startHangry - (605 - hangry);
@@ -378,14 +389,10 @@ public class player : MonoBehaviour
         if (!lockedPlayer)
         {
             Vector2 mouseDelta = Mouse.current.delta.ReadValue() * mouseSensitivity;
-
             yRotation += mouseDelta.x;
             xRotation -= mouseDelta.y;
-
             xRotation = Mathf.Clamp(xRotation, -80f, 80f);
-
-            head.transform.localRotation = Quaternion.Euler(0f, 0f, -xRotation);
-            transform.parent.rotation = Quaternion.Euler(0f, yRotation, 0f);
+            head.transform.localRotation = Quaternion.Euler(0f, yRotation, -xRotation);
         }
             if (hp <= 0)
             {
