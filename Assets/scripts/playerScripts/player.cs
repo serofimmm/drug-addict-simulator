@@ -96,7 +96,7 @@ public class player : MonoBehaviour
         {
             Uri uri = new Uri("tcp://" + startGame.gameIp.Replace("\u200B", "").Replace("\uFEFF", "").Trim());
             string host = uri.Host;
-            int port = uri.IsDefaultPort || uri.Port == -1 ? 7777 : uri.Port;
+            int port = uri.IsDefaultPort || uri.Port == -1 ? 8800 : uri.Port;
             client = new TcpClient(host, port);
             Debug.Log("Подключаюсь к: " + host + ":" + port);
         }
