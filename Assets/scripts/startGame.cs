@@ -48,6 +48,11 @@ public class startGame : MonoBehaviour
     {
         SceneManager.LoadScene("menu");
     }
+    public void exitMultiplayer()
+    {
+        SceneManager.LoadScene("menu");
+        multipayerMenu();
+    }
 
     public void multipayerMenu()
     {

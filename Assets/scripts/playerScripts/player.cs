@@ -75,7 +75,7 @@ public class player : MonoBehaviour
     bool positionInit = false;
     string messsegeForMUltiplayer = null;
     Animation animator;
-
+    float diconecttimer = 0;
 
     private void Awake()
     {
@@ -421,6 +421,7 @@ public class player : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "menu") return;
         Vector3 move = Vector3.zero;
         sendTimer += Time.fixedDeltaTime;
+        diconecttimer += Time.fixedDeltaTime;
         Vector3 forward = Camera.main.transform.forward;
         Vector3 right = Camera.main.transform.right;
 
@@ -469,6 +470,7 @@ public class player : MonoBehaviour
                 string message = getMessage();
                 if (message != null)
                 {
+                    diconecttimer = 0;
                     if (jsonChunk != null)
                     {
                         message = jsonChunk + message;
@@ -557,6 +559,15 @@ public class player : MonoBehaviour
                             }
                             
                         }
+                    }
+                }
+                else
+                {
+                    if(diconecttimer >= 1)
+                    {
+                        GameObject.Find("leave").GetComponent<CanvasGroup>().alpha = 1;
+                        GameObject.Find("leave").GetComponent<CanvasGroup>().blocksRaycasts = true;
+                        GameObject.Find("leave").GetComponent<CanvasGroup>().interactable = true;
                     }
                 }
             }
