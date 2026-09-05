@@ -392,7 +392,8 @@ public class player : MonoBehaviour
             yRotation += mouseDelta.x;
             xRotation -= mouseDelta.y;
             xRotation = Mathf.Clamp(xRotation, -80f, 80f);
-            head.transform.localRotation = Quaternion.Euler(0f, yRotation, -xRotation);
+            head.transform.localRotation = Quaternion.Euler(0f, 0f, -xRotation);
+            transform.parent.localRotation = Quaternion.Euler(0f, yRotation, 0f);
         }
             if (hp <= 0)
             {
@@ -563,7 +564,7 @@ public class player : MonoBehaviour
                 }
                 else
                 {
-                    if(diconecttimer >= 1)
+                    if(diconecttimer >= 2)
                     {
                         GameObject.Find("leave").GetComponent<CanvasGroup>().alpha = 1;
                         GameObject.Find("leave").GetComponent<CanvasGroup>().blocksRaycasts = true;
