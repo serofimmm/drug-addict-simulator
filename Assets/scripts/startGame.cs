@@ -78,6 +78,6 @@ public class startGame : MonoBehaviour
     }
     public void EnableConstraint()
     {
-        GameObject.Find("hand").GetComponent<ParentConstraint>().constraintActive = true;
+        transform.Find("Armature/Bone/Bone.001/Bone.002/Bone.064/hand").GetComponent<ParentConstraint>().constraintActive = true;
     }
 }

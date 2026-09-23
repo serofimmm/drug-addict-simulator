@@ -107,8 +107,8 @@ public class player : MonoBehaviour
         damage.SetActive(false);
         colideObject = GameObject.Find("colide object");
         rb = transform.parent.GetComponent<Rigidbody>();
-        hand = GameObject.Find("hand");
-        head = GameObject.Find("head");
+        hand = transform.parent.Find("Armature/Bone/Bone.001/Bone.002/Bone.064/hand").gameObject;
+        head = transform.Find("head").gameObject;
         menu = GameObject.Find("menu");
         menu.SetActive(false);
         novell = GameObject.Find("novell").GetComponent<CanvasGroup>();
@@ -291,7 +291,7 @@ public class player : MonoBehaviour
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             hand.GetComponent<ParentConstraint>().constraintActive = false;
-            hand.GetComponent<Animator>().SetTrigger("isAtack");
+            transform.parent.GetComponent<Animator>().SetTrigger("atack");
             Ray ray = transform.Find("head").Find("head in").Find("Main Camera").GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             GameObject obj;
             string nam = "";
@@ -356,7 +356,15 @@ public class player : MonoBehaviour
         {
             selectedSlot = 7;
         }
-        if(Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current.wKey.isPressed)
+        {
+            Debug.Log("W НАЖАТА");
+        }
+        transform.parent.GetComponent<Animator>().SetBool("walkF", Keyboard.current.wKey.isPressed);
+        transform.parent.GetComponent<Animator>().SetBool("walkB", Keyboard.current.sKey.isPressed);
+        transform.parent.GetComponent<Animator>().SetBool("walkL", Keyboard.current.aKey.isPressed);
+        transform.parent.GetComponent<Animator>().SetBool("walkR", Keyboard.current.dKey.isPressed);
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             if(menu.GetComponent<CanvasGroup>().alpha == 0)
             {
@@ -572,11 +580,6 @@ public class player : MonoBehaviour
                     }
                 }
             }
-        }
-        bool isMoving = move.sqrMagnitude > 0.01f;
-        if (walkAnimation != null)
-        {
-            walkAnimation.SetBool("isWalking", isMoving);
         }
         transform.parent.position += move.normalized * speed * Time.fixedDeltaTime;
     }
