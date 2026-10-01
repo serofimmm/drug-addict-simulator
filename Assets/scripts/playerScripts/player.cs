@@ -205,7 +205,7 @@ public class player : MonoBehaviour
                 float scaleZ = item.prefab.transform.localScale.z;
                 GameObject itemN = Instantiate(inventory[selectedSlot].prefab, hand.transform.Find("item"));
                 itemN.transform.localPosition = Vector3.zero;
-                itemN.transform.localRotation = Quaternion.identity;
+                itemN.transform.localRotation = Quaternion.Euler(180, 0, 0);
                 itemN.transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
                 lastitem = itemN;
                 lastInvItem = item;
@@ -250,8 +250,22 @@ public class player : MonoBehaviour
 
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    Destroy(GameObject.Find("cigarette" + smokedcigarettes[inventory[selectedSlot].id]));
-                    smokedcigarettes[inventory[selectedSlot].id]++;
+                    if(head.transform.Find("mask object").childCount == 0)
+                    {
+                        Destroy(GameObject.Find("cigarette" + smokedcigarettes[inventory[selectedSlot].id]));
+                        smokedcigarettes[inventory[selectedSlot].id]++;
+                        if (smokedcigarettes[inventory[selectedSlot].id] < 5)
+                        {
+                            Debug.LogError("внутри пачки остались сигареты "+ smokedcigarettes[inventory[selectedSlot].id]);
+                            GameObject cigarete = Instantiate(Resources.Load<GameObject>("Prefabs/cigarete"), head.transform.Find("mask object"));
+                            cigarete.transform.localPosition = new Vector3(0.00158f, -0.00072f, 0.0008f);
+                        }
+                    }
+                    else
+                    {
+                        Destroy(head.transform.Find("mask object").Find("cigarete(Clone)").gameObject);
+                        
+                    }
                 }
             }
         }
@@ -288,33 +302,53 @@ public class player : MonoBehaviour
                 speedhangry = 5;
             }
         }
+        if (Keyboard.current.cKey.wasReleasedThisFrame)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                if (inventory[i].prefab == nullObject)
+                {
+                    int id = randomID();
+                    InventoryItem cigarette = new InventoryItem();
+                    cigarette.prefab = Resources.Load<GameObject>("Prefabs/cigarettes");
+                    cigarette.id = Guid.NewGuid().ToString();
+                    cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
+                    inventory[i] = cigarette;
+                    smokedcigarettes[cigarette.id] = 1;
+                    break;
+                }
+            }
+        }
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            hand.GetComponent<ParentConstraint>().constraintActive = false;
-            transform.parent.GetComponent<Animator>().SetTrigger("atack");
-            Ray ray = transform.Find("head").Find("head in").Find("Main Camera").GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            GameObject obj;
-            string nam = "";
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            if(inventory[selectedSlot].prefab == nullObject)
             {
-                Vector3 lookPosition = hit.point;
-                obj = hit.transform.gameObject;
-                nam = hit.transform.name;
-            }
-            if (SceneManager.GetActiveScene().name == "multiplayer")
-            {
-                var data = new
+                hand.GetComponent<ParentConstraint>().constraintActive = false;
+                transform.parent.GetComponent<Animator>().SetTrigger("atack");
+                Ray ray = transform.Find("head").Find("head in").Find("Main Camera").GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                GameObject obj;
+                string nam = "";
+                if (Physics.Raycast(ray, out RaycastHit hit, 100f))
                 {
-                    type = "atack",
-                    session = playerName,
-                    x = transform.parent.position.x.ToString(CultureInfo.InvariantCulture),
-                    y = transform.parent.position.y.ToString(CultureInfo.InvariantCulture),
-                    z = transform.parent.position.z.ToString(CultureInfo.InvariantCulture),
-                    name = nam
+                    Vector3 lookPosition = hit.point;
+                    obj = hit.transform.gameObject;
+                    nam = hit.transform.name;
+                }
+                if (SceneManager.GetActiveScene().name == "multiplayer")
+                {
+                    var data = new
+                    {
+                        type = "atack",
+                        session = playerName,
+                        x = transform.parent.position.x.ToString(CultureInfo.InvariantCulture),
+                        y = transform.parent.position.y.ToString(CultureInfo.InvariantCulture),
+                        z = transform.parent.position.z.ToString(CultureInfo.InvariantCulture),
+                        name = nam
 
-                };
-                string json = JsonConvert.SerializeObject(data);
-                StartCoroutine(SendPostRequest(json));
+                    };
+                    string json = JsonConvert.SerializeObject(data);
+                    StartCoroutine(SendPostRequest(json));
+                }
             }
         }
         if (SceneManager.GetActiveScene().name != "multiplayer")
