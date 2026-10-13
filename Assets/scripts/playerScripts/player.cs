@@ -76,6 +76,7 @@ public class player : MonoBehaviour
     string messsegeForMUltiplayer = null;
     Animation animator;
     float diconecttimer = 0;
+    TMP_Text toolDesk;
 
     private void Awake()
     {
@@ -98,6 +99,7 @@ public class player : MonoBehaviour
             string host = uri.Host;
             int port = uri.IsDefaultPort || uri.Port == -1 ? 8800 : uri.Port;
             client = new TcpClient(host, port);
+            stream = client.GetStream();
             Debug.Log("Подключаюсь к: " + host + ":" + port);
         }
         Debug.Log("2 подключение прошло");
@@ -112,13 +114,12 @@ public class player : MonoBehaviour
         menu = GameObject.Find("menu");
         menu.SetActive(false);
         novell = GameObject.Find("novell").GetComponent<CanvasGroup>();
-        Debug.Log(novell.name);
         nullObject = GameObject.Find("null");
         hangryEl = GameObject.Find("hangryBar").GetComponent<RectTransform>();
         startHangry = hangryEl.anchoredPosition.x;
         walkAnimation = transform.parent.GetComponent<Animator>();
-        Debug.Log(startHangry);
-        stream = client.GetStream();
+        toolDesk = GameObject.Find("toolDesk").GetComponent<TMP_Text>();
+        toolDesk.gameObject.SetActive(false);
         for (int i = 0; i < 8; i++)
         {
             inventory[i] = new InventoryItem();
@@ -242,7 +243,16 @@ public class player : MonoBehaviour
         {
             if (inventory[selectedSlot].prefab.tag == "cigarettes")
             {
-                Debug.Log("держыш в руках");
+                toolDesk.gameObject.SetActive(true);
+                if(5 - smokedcigarettes[inventory[selectedSlot].id] >= 0)
+                {
+                    toolDesk.text = (5 - smokedcigarettes[inventory[selectedSlot].id]) + "/5";
+                }
+                else
+                {
+                    toolDesk.text = "0/5";
+                }
+                
                 for (int i = 0; i <= smokedcigarettes[inventory[selectedSlot].id]; i++)
                 {
                     Destroy(GameObject.Find("cigarette" + i));
@@ -254,7 +264,7 @@ public class player : MonoBehaviour
                     {
                         Destroy(GameObject.Find("cigarette" + smokedcigarettes[inventory[selectedSlot].id]));
                         smokedcigarettes[inventory[selectedSlot].id]++;
-                        if (smokedcigarettes[inventory[selectedSlot].id] < 5)
+                        if (smokedcigarettes[inventory[selectedSlot].id] < 6)
                         {
                             Debug.LogError("внутри пачки остались сигареты "+ smokedcigarettes[inventory[selectedSlot].id]);
                             GameObject cigarete = Instantiate(Resources.Load<GameObject>("Prefabs/cigarete"), head.transform.Find("mask object"));
@@ -268,8 +278,16 @@ public class player : MonoBehaviour
                     }
                 }
             }
+            else
+            {
+                toolDesk.gameObject.SetActive(false);
+            }
         }
-        
+        else
+        {
+            toolDesk.gameObject.SetActive(false);
+        }
+
         Vector2 mousePos = Mouse.current.position.ReadValue();
         if (script == null)
         {
@@ -314,7 +332,7 @@ public class player : MonoBehaviour
                     cigarette.id = Guid.NewGuid().ToString();
                     cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
                     inventory[i] = cigarette;
-                    smokedcigarettes[cigarette.id] = 1;
+                    smokedcigarettes[cigarette.id] = 0;
                     break;
                 }
             }
@@ -741,7 +759,7 @@ public class player : MonoBehaviour
                                         cigarette.id = Guid.NewGuid().ToString();
                                         cigarette.image = Resources.Load<Sprite>("sprites/cigarete");
                                         inventory[i] = cigarette;
-                                        smokedcigarettes[cigarette.id] = 1;
+                                        smokedcigarettes[cigarette.id] = 0;
                                         break;
                                     }
                                 }
