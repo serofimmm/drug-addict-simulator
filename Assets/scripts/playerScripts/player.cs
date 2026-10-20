@@ -77,6 +77,7 @@ public class player : MonoBehaviour
     Animation animator;
     float diconecttimer = 0;
     TMP_Text toolDesk;
+    dropedItem[] dropeditems;
 
     private void Awake()
     {
@@ -255,14 +256,18 @@ public class player : MonoBehaviour
                 
                 for (int i = 0; i <= smokedcigarettes[inventory[selectedSlot].id]; i++)
                 {
-                    Destroy(GameObject.Find("cigarette" + i));
+                    Transform cigarette = hand.transform.Find("item/cigarettes(Clone)/cigarette" + i);
+                    if (cigarette != null)
+                    {
+                        Destroy(cigarette.gameObject);
+                    }
                 }
 
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
                     if(head.transform.Find("mask object").childCount == 0)
                     {
-                        Destroy(GameObject.Find("cigarette" + smokedcigarettes[inventory[selectedSlot].id]));
+                        Destroy(hand.transform.Find("item/cigarettes(Clone)/cigarette" + smokedcigarettes[inventory[selectedSlot].id]));
                         smokedcigarettes[inventory[selectedSlot].id]++;
                         if (smokedcigarettes[inventory[selectedSlot].id] < 6)
                         {
@@ -336,6 +341,29 @@ public class player : MonoBehaviour
                     break;
                 }
             }
+        }
+        if (Keyboard.current.gKey.wasReleasedThisFrame)
+        {
+            GameObject item = Instantiate(inventory[selectedSlot].prefab);
+            dropItemObject drop =  item.AddComponent<dropItemObject>();
+            drop.prefab = inventory[selectedSlot].prefab;
+            drop.id = inventory[selectedSlot].id;
+            drop.image = inventory[selectedSlot].image;
+            inventory[selectedSlot].prefab = nullObject;
+            Ray ray = transform.Find("head").Find("head in").Find("Main Camera").GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            Camera cam = transform.Find("head").Find("head in")
+        .Find("Main Camera").GetComponent<Camera>();
+            Vector3 pos = cam.transform.position + cam.transform.forward * 1.5f;
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            {
+                Vector3 lookPosition = hit.point;
+                pos = hit.point - cam.transform.forward * 0.3f;
+            }
+            item.transform.position = pos;
+            item.transform.SetParent(null);
+            Rigidbody irb = item.AddComponent<Rigidbody>();
+            irb.isKinematic = false;
+            irb.detectCollisions = true;
         }
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -854,6 +882,30 @@ public class player : MonoBehaviour
             }
             
         }
+        if(other.gameObject != null)
+        {
+            dropItemObject dropped = other.GetComponent<dropItemObject>();
+            Debug.Log("Коснулся объекта: " + other.gameObject.name);
+            if (dropped != null)
+            {
+                Debug.Log("касаешся "+dropped.id);
+                for (int i = 0; i < 8; i++)
+                {
+                    if (inventory[i].prefab == nullObject)
+                    {
+                        inventory[i] = new InventoryItem(
+                            dropped.prefab,
+                            dropped.id,
+                            dropped.image
+                        );
+
+                        Destroy(other.gameObject);
+                        Destroy(dropped);
+                        break;
+                    }
+                }
+            }
+        }
     }
     void OnTriggerExit(Collider other)
     {
@@ -971,6 +1023,13 @@ public class InventoryItem
     {
         return id.GetHashCode(); 
     }
+}
+
+public class dropedItem
+{
+    public GameObject prefab;
+    public string id;
+    public Sprite image;
 }
 
 public class NetInventoryItem
