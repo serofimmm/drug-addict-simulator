@@ -20,6 +20,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Animations;
 using System.Net;
+using System.Collections;
 
 public class player : MonoBehaviour
 {
@@ -350,20 +351,22 @@ public class player : MonoBehaviour
             drop.id = inventory[selectedSlot].id;
             drop.image = inventory[selectedSlot].image;
             inventory[selectedSlot].prefab = nullObject;
-            Ray ray = transform.Find("head").Find("head in").Find("Main Camera").GetComponent<Camera>().ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             Camera cam = transform.Find("head").Find("head in")
-        .Find("Main Camera").GetComponent<Camera>();
-            Vector3 pos = cam.transform.position + cam.transform.forward * 1.5f;
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-            {
-                Vector3 lookPosition = hit.point;
-                pos = hit.point - cam.transform.forward * 0.3f;
-            }
+    .Find("Main Camera").GetComponent<Camera>();
+            Vector3 direction = cam.transform.forward;
+            Vector3 pos = hand.transform.Find("item").position+direction*0.5f;
             item.transform.position = pos;
             item.transform.SetParent(null);
+            item.GetComponent<BoxCollider>().enabled = false;
             Rigidbody irb = item.AddComponent<Rigidbody>();
             irb.isKinematic = false;
             irb.detectCollisions = true;
+            irb.useGravity = true;
+            irb.constraints = RigidbodyConstraints.None;
+            irb.linearVelocity = Vector3.zero;
+            irb.AddForce(direction * 8f, ForceMode.Impulse);
+            StartCoroutine(wait(0.2f));
+            item.GetComponent<BoxCollider>().enabled = true;
         }
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -997,6 +1000,10 @@ public class player : MonoBehaviour
     {
         return ids++;
     }
+    IEnumerator wait(float time)
+    {
+        yield return new WaitForSeconds(time);
+    }
 
 }
 public class InventoryItem
@@ -1024,6 +1031,8 @@ public class InventoryItem
         return id.GetHashCode(); 
     }
 }
+
+
 
 public class dropedItem
 {
